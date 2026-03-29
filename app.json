@@ -1,30 +1,71 @@
 {
   "expo": {
-    "name": "MusicScanAI",
+    "name": "MusicScan AI",
     "slug": "MusicScanAI",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "musicscanai",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0A0A0F"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.musicscanai.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["audio", "fetch"],
+        "NSAppleMusicUsageDescription": "MusicScan AI needs access to your music library to scan and play your tracks.",
+        "NSMicrophoneUsageDescription": "MusicScan AI needs microphone access for audio features.",
+        "UIRequiredDeviceCapabilities": ["armv7"],
+        "UISupportedInterfaceOrientations": ["portrait", "landscape"],
+        "UISupportedInterfaceOrientations~ipad": ["portrait", "landscape", "portrait-secondary", "landscape-secondary"]
+      }
     },
     "android": {
+      "package": "com.musicscanai.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0A0A0F"
       },
+      "permissions": [
+        "READ_MEDIA_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "WAKE_LOCK",
+        "VIBRATE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "permissions": {
+            "isAccessMediaLocationEnabled": true
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MusicScan AI needs access to your photos to set album artwork."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "musicscan-ai"
+      }
     }
   }
 }
