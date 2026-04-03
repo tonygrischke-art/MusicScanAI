@@ -38,9 +38,7 @@
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "WAKE_LOCK",
         "VIBRATE"
-      ],
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
