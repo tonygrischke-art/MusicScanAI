@@ -62,9 +62,10 @@
         }
       ]
     ],
+    "owner": "grischke",
     "extra": {
       "eas": {
-        "projectId": "musicscan-ai"
+        "projectId": "b50e96e1-b48a-4b89-a913-a0a2b20060b3"
       }
     }
   }
