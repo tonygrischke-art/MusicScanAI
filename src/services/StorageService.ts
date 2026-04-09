@@ -1,8 +1,8 @@
-import { createMMKV } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 import { Track, Playlist, UserSettings, ScanProgress, AIAnalysisProgress } from '../types';
 import { STORAGE_KEYS, DEFAULT_SETTINGS } from '../utils/constants';
 
-const storage = createMMKV({ id: 'musicscan-storage' });
+const storage = new MMKV({ id: 'musicscan-storage' });
 
 export const StorageService = {
   getTracks(): Track[] {
@@ -76,7 +76,7 @@ export const StorageService = {
   },
 
   clearScanState(): void {
-    storage.remove(STORAGE_KEYS.SCAN_STATE);
+    storage.delete(STORAGE_KEYS.SCAN_STATE);
   },
 
   getAIState(): AIAnalysisProgress | null {
@@ -94,7 +94,7 @@ export const StorageService = {
   },
 
   clearAIState(): void {
-    storage.remove(STORAGE_KEYS.AI_STATE);
+    storage.delete(STORAGE_KEYS.AI_STATE);
   },
 
   clearAll(): void {
