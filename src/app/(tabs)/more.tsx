@@ -18,6 +18,10 @@ const MENU_ITEMS = [
   { label: '⏱️ Sleep Timer', route: '/sleep-timer', description: 'Auto-stop playback' },
   { label: '🔍 Find Duplicates', route: '/duplicates', description: 'Find duplicate tracks' },
   { label: '💀 Dead Files', route: '/dead-files', description: 'Find missing files' },
+  { label: '🎶 Genre Playlists', route: '/genre-playlists', description: 'Auto-group by genre + pie chart' },
+  { label: '✨ Smart Playlist', route: '/smart-playlist', description: 'Natural language playlist builder' },
+  { label: '🔧 Metadata Fixer', route: '/metadata-fixer', description: 'Fix missing/bad metadata with AI' },
+  { label: '🖼️ Album Art Fetcher', route: '/album-art', description: 'Fetch missing album art' },
 ];
 
 export default function MoreScreen() {

@@ -10,3 +10,7 @@ export { DuplicateService } from './duplicateService';
 export { DeadFileService } from './deadFileService';
 export { M3UExporter } from '../utils/m3uExporter';
 export { LyricsService } from './lyricsService';
+export { GenreService } from './genreService';
+export { SmartPlaylistService } from './smartPlaylistService';
+export { MetadataFixerService } from './metadataFixerService';
+export { AlbumArtService } from './albumArtService';
