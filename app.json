@@ -45,12 +45,14 @@
       "bundler": "metro"
     },
     "plugins": [
+      "expo-router",
+      "react-native-track-player",
       [
         "expo-media-library",
         {
-          "permissions": {
-            "isAccessMediaLocationEnabled": true
-          }
+          "photosPermission": "Allow MusicScan AI to access your music library.",
+          "savePhotosPermission": "Allow MusicScan AI to save music.",
+          "isAccessMediaLocationEnabled": true
         }
       ],
       [

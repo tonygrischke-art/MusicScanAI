@@ -6,3 +6,6 @@ export { default as EmptyState } from './EmptyState';
 export { default as Skeleton, TrackRowSkeleton, PlaylistCardSkeleton, StatsSkeleton } from './SkeletonLoader';
 export { default as WaveformVisualizer, WaveformProgressBar } from './WaveformVisualizer';
 export { ThemeProvider, useTheme } from './ThemeProvider';
+export { Equalizer } from './Equalizer';
+export { WaveformScrubber } from './WaveformScrubber';
+export { SleepTimer } from './SleepTimer';

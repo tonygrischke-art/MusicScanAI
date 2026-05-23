@@ -153,6 +153,20 @@ export default function TabsLayout() {
           tabBarButton: () => null,
         }}
       />
+      <Tabs.Screen
+        name="equalizer"
+        options={{
+          title: 'EQ',
+          tabBarLabel: 'EQ',
+        }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          tabBarLabel: 'More',
+        }}
+      />
     </Tabs>
   );
 }

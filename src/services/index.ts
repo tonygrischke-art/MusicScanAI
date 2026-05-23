@@ -2,3 +2,11 @@ export { AudioService, setupAudioService, PlaybackService } from './AudioService
 export { ScanningService } from './ScanningService';
 export { AIService } from './AIService';
 export { StorageService } from './StorageService';
+export { MoodService } from './moodService';
+export { TrackDescriptionService } from './trackDescriptionService';
+export { SimilarityService } from './similarityService';
+export { BPMService } from './bpmService';
+export { DuplicateService } from './duplicateService';
+export { DeadFileService } from './deadFileService';
+export { M3UExporter } from '../utils/m3uExporter';
+export { LyricsService } from './lyricsService';
