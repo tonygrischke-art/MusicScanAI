@@ -31,6 +31,9 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Prebuild Android
+      run: npx expo prebuild --platform android --no-install
+
     - name: Build Android
       run: |
         cd android
