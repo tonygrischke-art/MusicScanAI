@@ -6,8 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
-    "jsEngine": "jsc",
+    "newArchEnabled": false,
     "scheme": "musicscanai",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -46,13 +45,12 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow MusicScan AI to access your music library.",
-          "savePhotosPermission": "Allow MusicScan AI to save music.",
-          "isAccessMediaLocationEnabled": true
+          "permissions": {
+            "isAccessMediaLocationEnabled": true
+          }
         }
       ],
       [

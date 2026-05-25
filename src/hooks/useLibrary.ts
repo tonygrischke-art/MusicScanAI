@@ -47,7 +47,7 @@ export const useLibrary = () => {
     addTrackToPlaylist,
     removeTrackFromPlaylist,
     reorderPlaylistTracks,
-  } = useLibrary();
+  } = useLibraryStore();
 
   const { addToHistory } = useAudioStore();
   const { updateActiveFilters, clearActiveFilters, showNotification } = useUIStore();
