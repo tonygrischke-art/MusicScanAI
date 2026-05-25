@@ -31,19 +31,6 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Prebuild Android
-      run: npx expo prebuild --platform android --no-install
-
-    - name: Fix compileSdkVersion
-      run: |
-        # Fix the expo module's build.gradle which lacks compileSdkVersion
-        EXPO_BG="android/node_modules/expo/android/build.gradle"
-        if [ -f "$EXPO_BG" ]; then
-          sed -i 's/android {/android {\n    compileSdkVersion 35/' "$EXPO_BG"
-        fi
-        # Also fix any generated build.gradle that might need it
-        find android -name "build.gradle" -exec grep -l "compileSdkVersion" {} \; 2>/dev/null | head -5
-
     - name: Build Android
       run: |
         cd android
