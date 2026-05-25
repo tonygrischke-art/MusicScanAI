@@ -8,40 +8,60 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
-    
+
     - name: Install dependencies
-      run: npm install
-    
+      run: npm install --legacy-peer-deps
+
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: 17
-    
+
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-    
+
     - name: Prebuild Android
       run: npx expo prebuild --platform android --no-install
-    
+
+    - name: Fix compileSdkVersion
+      run: |
+        # Fix the expo module's build.gradle which lacks compileSdkVersion
+        EXPO_BG="android/node_modules/expo/android/build.gradle"
+        if [ -f "$EXPO_BG" ]; then
+          sed -i 's/android {/android {\n    compileSdkVersion 35/' "$EXPO_BG"
+        fi
+        # Also fix any generated build.gradle that might need it
+        find android -name "build.gradle" -exec grep -l "compileSdkVersion" {} \; 2>/dev/null | head -5
+
     - name: Build Android
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon
-    
+        ./gradlew assembleDebug --no-daemon 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+
     - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: MusicScanAI-Debug
         path: android/app/build/outputs/apk/debug/*.apk
+        retention-days: 30
+
+    - name: Upload build log on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log
+        path: android/build_output.txt
+        retention-days: 7
