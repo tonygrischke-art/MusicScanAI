@@ -29,26 +29,14 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Install Android SDK manually
-      run: |
-        # Install Android SDK command line tools
-        mkdir -p $ANDROID_HOME/cmdline-tools/latest
-        cd $ANDROID_HOME/cmdline-tools/latest
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip -q commandlinetools-linux-11076708_latest.zip
-        mv cmdline-tools/* .
-        rm -rf cmdline-tools commandlinetools-linux-11076708_latest.zip
-        echo "y" | ./bin/sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-34" "build-tools;34.0.0" "platform-tools" "ndk;27.0.12077973" || true
-        echo "y" | ./bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses || true
-        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-        echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-
-    - name: Verify Android SDK
+    - name: Verify Android SDK (pre-installed on ubuntu-latest)
       run: |
         echo "ANDROID_HOME: $ANDROID_HOME"
         ls -la $ANDROID_HOME/
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list | head -20
+
+    - name: Accept Android SDK licenses
+      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Cache Gradle packages
       uses: actions/cache@v4
