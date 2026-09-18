@@ -12,6 +12,7 @@ const TabBarIcon = ({ name, focused, color }: { name: string; focused: boolean; 
     home: '🏠',
     library: '📚',
     playlists: '🎶',
+    dream: '✨',
     player: '🎧',
   };
 
@@ -144,6 +145,13 @@ export default function TabsLayout() {
         options={{
           title: 'Playlists',
           tabBarLabel: 'Playlists',
+        }}
+      />
+      <Tabs.Screen
+        name="dream"
+        options={{
+          title: 'Dream',
+          tabBarLabel: 'Dream',
         }}
       />
       <Tabs.Screen

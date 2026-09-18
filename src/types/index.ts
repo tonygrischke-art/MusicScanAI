@@ -23,6 +23,11 @@ export interface Track {
   energy: number;
   valence: number;
   mood: MoodType | null;
+  moodCoordinate?: {
+    valence: number;
+    energy: number;
+    label: string;
+  };
   confidence: number;
   isFavorite: boolean;
   rating: number;
@@ -173,3 +178,6 @@ export const GENRES: GenreType[] = [
 export const MOODS: MoodType[] = [
   'energetic', 'chill', 'melancholic', 'euphoric', 'aggressive', 'romantic'
 ];
+
+// Re-export journey types
+export * from './journey';

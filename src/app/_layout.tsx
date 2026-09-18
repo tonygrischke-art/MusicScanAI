@@ -9,7 +9,9 @@ import { useUIStore } from '../stores/useUIStore';
 import { useLibrary } from '../stores/useLibraryStore';
 import { useAudioStore } from '../stores/useAudioStore';
 import { useAIStore } from '../stores/useAIStore';
+import { useJourneyStore } from '../store/journeyStore';
 import { setupAudioService } from '../services/AudioService';
+import { loadJourneysFromStorage } from '../store/journeyStore';
 import { MINI_PLAYER_HEIGHT, TAB_BAR_HEIGHT } from '../utils/constants';
 
 function NotificationToast() {
@@ -50,6 +52,7 @@ function AppContent() {
       await setupAudioService();
       refreshLibrary();
       loadSettings();
+      loadJourneysFromStorage();
     };
     init();
   }, []);
@@ -90,6 +93,20 @@ function AppContent() {
           name="ai-pipeline"
           options={{
             presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="journey-builder"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="journey-player"
+          options={{
+            presentation: 'fullScreenModal',
             animation: 'slide_from_bottom',
           }}
         />
