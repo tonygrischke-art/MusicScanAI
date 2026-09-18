@@ -58,6 +58,7 @@ Only suggest fixes for fields that are missing or likely wrong. Use the filename
 
     try {
       const response = await AIService.chat(prompt);
+      if (!response) throw new Error('No response from AI');
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
@@ -135,7 +136,7 @@ Only suggest fixes for fields that are missing or likely wrong. Use the filename
       }
 
       if (!track.year && recording.releases?.[0]?.date) {
-        const year = parseInt(record.releases[0].date.slice(0, 4));
+        const year = parseInt(recording.releases[0].date.slice(0, 4));
         if (!isNaN(year)) {
           fixes.push({
             trackId: track.id,

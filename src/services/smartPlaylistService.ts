@@ -38,6 +38,7 @@ Return JSON:
 
     try {
       const response = await AIService.chat(prompt);
+      if (!response) throw new Error('No response from AI');
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('No JSON in response');
 

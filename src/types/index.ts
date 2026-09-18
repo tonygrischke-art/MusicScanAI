@@ -1,9 +1,12 @@
-export type MoodType = 'energetic' | 'chill' | 'melancholic' | 'euphoric' | 'aggressive' | 'romantic';
+export type MoodType = 
+  'energetic' | 'chill' | 'melancholic' | 'euphoric' | 'aggressive' | 'romantic'
+  | string; // Allow arbitrary mood strings from metadata
 
 export type GenreType = 
   | 'pop' | 'rock' | 'hip-hop' | 'electronic' | 'classical' 
   | 'jazz' | 'r&b' | 'country' | 'metal' | 'indie'
-  | 'folk' | 'blues' | 'reggae' | 'latin' | 'ambient';
+  | 'folk' | 'blues' | 'reggae' | 'latin' | 'ambient'
+  | string; // Allow arbitrary genre strings from metadata
 
 export interface Track {
   id: string;
@@ -68,6 +71,13 @@ export interface ScanProgress {
   totalFiles: number;
   percentage: number;
   error: string | null;
+}
+
+export interface ScanResult {
+  artist: string;
+  album: string;
+  year: number;
+  tracks: string[];
 }
 
 export interface AIAnalysisProgress {

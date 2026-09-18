@@ -24,6 +24,7 @@
     "expo-media-library": "~17.0.0",
     "expo-modules-autolinking": "^56.0.12",
     "expo-router": "~4.0.0",
+    "expo-sensors": "^57.0.3",
     "expo-status-bar": "~2.0.0",
     "expo-system-ui": "~4.0.6",
     "react": "18.3.1",

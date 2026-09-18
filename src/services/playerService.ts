@@ -1,4 +1,5 @@
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { AppKilledPlaybackBehavior } from 'react-native-track-player';
+import { Capability } from 'react-native-track-player/src/constants';
 
 export const setupPlayer = async () => {
   await TrackPlayer.setupPlayer();
@@ -6,22 +7,23 @@ export const setupPlayer = async () => {
   await TrackPlayer.updateOptions({
     stopWithApp: false,
     capabilities: [
-      TrackPlayer.CAPABILITY_PLAY,
-      TrackPlayer.CAPABILITY_PAUSE,
-      TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-      TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-      TrackPlayer.CAPABILITY_STOP,
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
+      Capability.Stop,
     ],
     compactCapabilities: [
-      TrackPlayer.CAPABILITY_PLAY,
-      TrackPlayer.CAPABILITY_PAUSE,
+      Capability.Play,
+      Capability.Pause,
     ],
     notificationCapabilities: [
-      TrackPlayer.CAPABILITY_PLAY,
-      TrackPlayer.CAPABILITY_PAUSE,
-      TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
-      TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
     ],
+    appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
   });
 };
 

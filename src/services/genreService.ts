@@ -58,6 +58,7 @@ export class GenreService {
 
     try {
       const response = await AIService.chat(prompt);
+      if (!response) return null;
       const cleaned = response.toLowerCase().trim();
       const match = GENRES.find(g => cleaned.includes(g));
       if (match) return match;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import MMKV from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 
 interface Track {
   id: string;
@@ -43,11 +43,13 @@ interface MusicStore {
   currentTrack: Track | null;
   isScanning: boolean;
   scanResult: ScanResult | null;
+  isPlaying: boolean;
   
   addTrack: (track: Track) => void;
   setCurrentTrack: (track: Track | null) => void;
   setScanResult: (result: ScanResult | null) => void;
   setIsScanning: (isScanning: boolean) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
 }
 
 const storage = new MMKV();
@@ -59,6 +61,7 @@ export const useStore = create<MusicStore>()(
       currentTrack: null,
       isScanning: false,
       scanResult: null,
+      isPlaying: false,
       
       addTrack: (track) => set((state) => ({
         tracks: [...state.tracks, track]
@@ -66,7 +69,7 @@ export const useStore = create<MusicStore>()(
       
       setCurrentTrack: (track) => set((state) => ({
         currentTrack: track,
-        isPlaying: track ? state.isPlaying : false
+        isPlaying: track ? true : false
       })),
       
       setScanResult: (result) => set((state) => ({
@@ -75,6 +78,10 @@ export const useStore = create<MusicStore>()(
       
       setIsScanning: (isScanning) => set((state) => ({
         isScanning
+      })),
+      
+      setIsPlaying: (isPlaying) => set((state) => ({
+        isPlaying
       }))
     }),
     {

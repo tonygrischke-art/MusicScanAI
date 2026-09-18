@@ -378,6 +378,15 @@ BPM: ${track.bpm}`;
       },
     };
   },
+
+  // Generic chat method for other services
+  async chat(prompt: string): Promise<string | null> {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('API key not configured');
+    }
+    return this.callGemini(prompt, apiKey);
+  },
 };
 
 export default AIService;

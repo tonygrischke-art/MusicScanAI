@@ -17,6 +17,7 @@ export class TrackDescriptionService {
 
     try {
       const desc = await AIService.chat(prompt);
+      if (!desc) throw new Error('No description from AI');
       return desc.replace(/^["']|["']$/g, '').trim();
     } catch {
       return `${track.genre ? track.genre.charAt(0).toUpperCase() + track.genre.slice(1) : 'Musical'} track${track.bpm ? ` at ${track.bpm} BPM` : ''}.`;

@@ -53,7 +53,7 @@ export class BPMService {
     const colors: Record<string, string> = {
       'C': '#FF6B6B', 'C#': '#FF8E53', 'D': '#FFA502', 'D#': '#FFD93D',
       'E': '#6BCB77', 'F': '#4D96FF', 'F#': '#6C5CE7', 'G': '#A29BFE',
-      'G': '#FD79A8', 'A': '#E17055', 'A#': '#00B894', 'B': '#0984E3',
+      'G#': '#FD79A8', 'A': '#E17055', 'A#': '#00B894', 'B': '#0984E3',
     };
     if (!key) return '#666';
     const root = key.split(' ')[0];

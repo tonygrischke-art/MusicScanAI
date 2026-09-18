@@ -1,11 +1,4 @@
-import { ScanResult } from '../stores/musicStore';
-
-interface ScanResult {
-  artist: string;
-  album: string;
-  year: number;
-  tracks: string[];
-}
+import { ScanResult } from '../types';
 
 export const scanAlbumImage = async (base64: string): Promise<ScanResult | null> => {
   try {

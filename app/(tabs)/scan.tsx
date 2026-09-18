@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useStore } from '../../src/stores/musicStore';
-import { scanAlbumImage } from '../../src/services/aiService';
+import { scanAlbumImage } from '../../src/services/scanAlbumService';
 
 export default function ScanScreen() {
   const [isScanning, setIsScanning] = useState(false);
@@ -12,20 +12,20 @@ export default function ScanScreen() {
     setIsScanning(true);
     
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
 
-      if (!result.canceled) {
-        const imageUri = result.assets[0].uri;
+      if (!pickerResult.canceled) {
+        const imageUri = pickerResult.assets[0].uri;
         
         // Convert image to base64
         const response = await fetch(imageUri);
         const blob = await response.blob();
-        const base64 = await new Promise((resolve, reject) => {
+        const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
           reader.onerror = reject;
@@ -33,16 +33,16 @@ export default function ScanScreen() {
         });
         
         // Scan the image using AI
-        const result = await scanAlbumImage(base64);
+        const scanResult = await scanAlbumImage(base64);
         
-        if (result) {
+        if (scanResult) {
           addTrack({
             id: Date.now().toString(),
-            title: result.album,
-            artist: result.artist,
-            album: result.album,
+            title: scanResult.album,
+            artist: scanResult.artist,
+            album: scanResult.album,
             genre: null,
-            year: result.year || null,
+            year: scanResult.year || null,
             duration: 0,
             path: '',
             artwork: '',

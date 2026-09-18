@@ -16,7 +16,7 @@ import { MoodService } from '../services/moodService';
 import { useLibrary } from '../stores/useLibraryStore';
 import { useAudioStore } from '../stores/useAudioStore';
 import { useTheme } from '../components/ThemeProvider';
-import { TrackRow } from '../components/TrackRow';
+import TrackRow from '../components/TrackRow';
 import { Track } from '../types';
 import { TAB_BAR_HEIGHT } from '../utils/constants';
 
@@ -117,7 +117,12 @@ export default function MoodSearchScreen() {
 
       <ScrollView style={styles.results} contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 20 }}>
         {results.map((track) => (
-          <TrackRow key={track.id} track={track} />
+          <TrackRow
+            key={track.id}
+            track={track}
+            onPress={() => {}}
+            onLongPress={() => {}}
+          />
         ))}
         {hasSearched && !isLoading && results.length === 0 && (
           <View style={styles.empty}>

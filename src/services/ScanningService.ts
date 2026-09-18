@@ -28,10 +28,11 @@ const extractMetadata = async (asset: MediaLibrary.Asset): Promise<Partial<Track
   if ('sampleRate' in asset && asset.sampleRate !== undefined) metadata.sampleRate = asset.sampleRate as number;
   if ('channels' in asset && asset.channels !== undefined) metadata.channels = asset.channels as number;
   
-  // These properties may or may not exist depending on asset subtype
-  if (asset.title) metadata.title = String(asset.title);
-  if (asset.artist) metadata.artist = String(asset.artist);
-  if (asset.album) metadata.album = String(asset.album);
+  // These properties may or may not exist depending on asset subtype - use type assertion
+  const assetAny = asset as any;
+  if (assetAny.title) metadata.title = String(assetAny.title);
+  if (assetAny.artist) metadata.artist = String(assetAny.artist);
+  if (assetAny.album) metadata.album = String(assetAny.album);
 
   return metadata as Partial<Track>;
 };
@@ -122,6 +123,7 @@ export const ScanningService = {
 
         try {
           const metadata = await extractMetadata(asset);
+          const assetAny = asset as any;
           const artworkUri = asset.mediaType === MediaLibrary.MediaType.audio
             ? null
             : asset.uri;
@@ -131,8 +133,8 @@ export const ScanningService = {
           const track: Track = {
             id: generateId(),
             title: asset.filename.replace(/\.[^/.]+$/, ''),
-            artist: asset.artist || 'Unknown Artist',
-            album: asset.album || null,
+            artist: assetAny.artist || 'Unknown Artist',
+            album: assetAny.album || null,
             genre: 'pop',
             year: null,
             duration: metadata.duration || 0,

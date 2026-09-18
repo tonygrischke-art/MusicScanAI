@@ -51,6 +51,7 @@ export class MoodService {
     try {
       const prompt = `Analyze the mood of this music request: "${text}". Respond with JSON: {"mood": "energetic|chill|melancholic|euphoric|aggressive|romantic", "confidence": 0-1, "keywords": ["word1", "word2"]}`;
       const response = await AIService.chat(prompt);
+      if (!response) throw new Error('No response from AI');
       const json = JSON.parse(response);
       return {
         mood: json.mood || 'chill',
