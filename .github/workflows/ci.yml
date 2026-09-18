@@ -84,11 +84,22 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         api-level: 34
-        ndk-version: r26d
+        ndk-version: r27c
         cache: gradle
+        cache-key: ${{ runner.os }}-android-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
 
     - name: Accept Android SDK licenses
       run: yes | sdkmanager --licenses || true
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
     - name: Expo prebuild
       run: npx expo prebuild --platform android --no-install
