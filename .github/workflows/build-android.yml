@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
     - name: Checkout
@@ -49,14 +50,22 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Prebuild Android
-      run: npx expo prebuild --platform android --no-install
+    - name: Configure Gradle
+      run: |
+        cat > android/gradle.properties << 'EOF'
+        org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g
+        org.gradle.parallel=true
+        org.gradle.configureondemand=true
+        android.useAndroidX=true
+        android.enableJetifier=true
+        kotlin.code.style=official
+        EOF
 
     - name: Build Android
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
 
     - name: Upload APK
       if: success()
