@@ -66,7 +66,7 @@ jobs:
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
 
     - name: Upload APK
       if: success()
