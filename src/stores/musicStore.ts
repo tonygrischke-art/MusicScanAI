@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, PersistStorage, StateStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';
 
 interface Track {
@@ -54,6 +54,39 @@ interface MusicStore {
 
 const storage = new MMKV();
 
+// Create a StateStorage for MMKV (used by createJSONStorage internally)
+const mmkvStateStorage: StateStorage = {
+  getItem: (name: string) => {
+    const value = storage.getString(name);
+    return value ?? null;
+  },
+  setItem: (name: string, value: string) => {
+    storage.set(name, value);
+  },
+  removeItem: (name: string) => {
+    storage.delete(name);
+  },
+};
+
+// Create a custom PersistStorage that uses MMKV with JSON serialization
+const mmkvPersistStorage = {
+  getItem: (name: string) => {
+    const value = storage.getString(name);
+    if (!value) return null;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: { state: any; version?: number }) => {
+    storage.set(name, JSON.stringify(value));
+  },
+  removeItem: (name: string) => {
+    storage.delete(name);
+  },
+};
+
 export const useStore = create<MusicStore>()(
   persist(
     (set, get) => ({
@@ -86,18 +119,7 @@ export const useStore = create<MusicStore>()(
     }),
     {
       name: 'music-store',
-      storage: {
-        getItem: (name) => {
-          const value = storage.getString(name);
-          return value ? value : null;
-        },
-        setItem: (name, value) => {
-          storage.set(name, value);
-        },
-        removeItem: (name) => {
-          storage.delete(name);
-        }
-      }
+      storage: mmkvPersistStorage,
     }
   )
 );
