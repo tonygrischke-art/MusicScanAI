@@ -80,18 +80,14 @@ jobs:
         distribution: temurin
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        api-level: 34
-        ndk-version: r27c
-        cache: gradle
-        cache-key: ${{ runner.os }}-android-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
-        emulator: false
-        disable-tools: true
+    - name: Verify Android SDK (pre-installed on ubuntu-latest)
+      run: |
+        echo "ANDROID_HOME: $ANDROID_HOME"
+        ls -la $ANDROID_HOME/
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list | head -20
 
     - name: Accept Android SDK licenses
-      run: yes | sdkmanager --licenses || true
+      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Cache Gradle packages
       uses: actions/cache@v4
