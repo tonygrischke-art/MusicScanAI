@@ -80,7 +80,7 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
-def hermesEnabled = project.hasProperty('expo.jsEngine') ? project.property('expo.jsEngine') == "hermes" : true
+ext.hermesEnabled = project.hasProperty('expo.jsEngine') ? project.property('expo.jsEngine') == "hermes" : true
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -170,7 +170,7 @@ dependencies {
         }
     }
 
-    if (hermesEnabled.toBoolean()) {
+    if (project.hermesEnabled) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
