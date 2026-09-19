@@ -128,6 +128,20 @@ android {
     }
 }
 
+// Configure Hermes/JSC dependency after project evaluation
+afterEvaluate {
+    def hermesEnabled = project.hasProperty('expo.jsEngine') ? project.property('expo.jsEngine') == "hermes" : true
+    if (hermesEnabled) {
+        dependencies {
+            implementation("com.facebook.react:hermes-android")
+        }
+    } else {
+        dependencies {
+            implementation jscFlavor
+        }
+    }
+}
+
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
 // Accepts values in comma delimited lists, example:
 // android.packagingOptions.pickFirsts=/LICENSE,**/picasa.ini
@@ -168,11 +182,5 @@ dependencies {
             // Animated webp support
             implementation("com.facebook.fresco:animated-webp:${reactAndroidLibs.versions.fresco.get()}")
         }
-    }
-
-    if (project.hermesEnabled) {
-        implementation("com.facebook.react:hermes-android")
-    } else {
-        implementation jscFlavor
     }
 }
