@@ -76,6 +76,16 @@ jobs:
     - name: Expo prebuild
       run: npx expo prebuild --platform android --no-install --clean
 
+    - name: Patch expo-application build.gradle for expo-module-gradle-plugin
+      run: |
+        EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
+        if [ -f "$EXPO_APP_GRADLE" ]; then
+          sed -i "s/id 'expo-module-gradle-plugin'/apply from: '\${project.rootDir}\/node_modules\/expo-modules-core\/android\/ExpoModulesCorePlugin.gradle'/" "$EXPO_APP_GRADLE"
+          echo "Patched $EXPO_APP_GRADLE"
+        else
+          echo "Warning: $EXPO_APP_GRADLE not found"
+        fi
+
     - name: Disable Hermes in gradle.properties
       run: sed -i 's/hermesEnabled=true/hermesEnabled=false/' android/gradle.properties
 
