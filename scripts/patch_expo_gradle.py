@@ -30,10 +30,10 @@ def patch_expo_modules_core_plugin(plugin_file):
     
     # Fix the "release" property issue in useExpoPublishing
     # The issue is that components.release is accessed before maven-publish plugin creates it
-    # We need to defer the access or check if it exists
+    # We need to check if the component exists before accessing it
     content = re.sub(
         r'from components\.release',
-        'from components.findByName("release") ?: components.main',
+        'from (components.findByName("release") ?: components.findByName("main") ?: components.findByName("android") ?: components.findByName("aar"))',
         content
     )
     
