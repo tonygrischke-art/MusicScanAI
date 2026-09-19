@@ -2,4 +2,7 @@
 module.exports = {
   extends: 'expo',
   ignorePatterns: ['/dist/*'],
+  globals: {
+    __dirname: 'readonly',
+  },
 };

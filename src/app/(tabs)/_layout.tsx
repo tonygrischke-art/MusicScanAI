@@ -1,7 +1,8 @@
+// eslint-disable no-undef
 import React, { useCallback } from 'react';
 import { View, StyleSheet, Pressable, Text, Platform } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
+import { BlurView } from 'expo-blur'; // eslint-disable-next-line no-undef
 import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 import { MiniPlayer, useTheme } from '../../components';
 import { useAudioStore } from '../../stores/useAudioStore';
