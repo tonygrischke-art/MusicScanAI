@@ -80,7 +80,10 @@ jobs:
       run: |
         EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
         if [ -f "$EXPO_APP_GRADLE" ]; then
-          sed -i "s/id 'expo-module-gradle-plugin'/apply from: '\${project.rootDir}\/node_modules\/expo-modules-core\/android\/ExpoModulesCorePlugin.gradle'/" "$EXPO_APP_GRADLE"
+          # Remove the id 'expo-module-gradle-plugin' line from plugins block
+          sed -i "/id 'expo-module-gradle-plugin'/d" "$EXPO_APP_GRADLE"
+          # Add apply from after the plugins block
+          sed -i "/^plugins {/,/^}/ { /^}/a apply from: '\${project.rootDir}\/node_modules\/expo-modules-core\/android\/ExpoModulesCorePlugin.gradle' }" "$EXPO_APP_GRADLE"
           echo "Patched $EXPO_APP_GRADLE"
         else
           echo "Warning: $EXPO_APP_GRADLE not found"
