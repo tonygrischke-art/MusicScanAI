@@ -87,16 +87,13 @@ jobs:
           echo "Warning: $EXPO_APP_GRADLE not found"
         fi
 
-    - name: Disable Hermes in gradle.properties
-      run: sed -i 's/hermesEnabled=true/hermesEnabled=false/' android/gradle.properties
-
     - name: Grant gradlew execute permission
       run: chmod +x android/gradlew
 
     - name: Build debug APK
       run: |
         cd android
-        ./gradlew assembleDebug --no-daemon
+        ./gradlew assembleDebug --no-daemon -PhermesEnabled=false
       env:
         GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
