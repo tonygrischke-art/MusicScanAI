@@ -93,7 +93,7 @@ jobs:
     - name: Build debug APK
       run: |
         cd android
-        ./gradlew assembleDebug --no-daemon -PhermesEnabled=false
+        ./gradlew assembleDebug --no-daemon -Phermesenabled=false
       env:
         GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
