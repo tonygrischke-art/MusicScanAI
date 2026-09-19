@@ -13,7 +13,7 @@ def patch_expo_application_gradle(gradle_file):
     # Use relative path from expo-application/android to expo-modules-core/android
     content = re.sub(
         r'(^plugins \{[^}]+\})',
-        r'\1\n\napply from: "${project.rootDir}/../../expo-modules-core/android/ExpoModulesCorePlugin.gradle"',
+        r'\1\n\napply from: "${project.rootDir}/../node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"',
         content,
         count=1,
         flags=re.MULTILINE
