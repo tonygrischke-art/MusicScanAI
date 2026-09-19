@@ -103,40 +103,7 @@ jobs:
       run: npx expo prebuild --platform android --no-install
 
     - name: Patch app/build.gradle for Hermes/JSC
-      run: |
-        cd android/app
-        # Remove any existing hermesEnabled references
-        sed -i '/hermesEnabled/d' build.gradle
-        # Add hermes/jsc dependency configuration after android block using Python
-        python3 << 'PYEOF'
-with open('build.gradle', 'r') as f:
-    content = f.read()
-
-# Find the closing brace of android block and add afterEvaluate after it
-import re
-pattern = r'(^})'
-replacement = r'''\1
-
-// Configure Hermes/JSC dependency after project evaluation
-afterEvaluate {
-    def useHermes = project.hasProperty('expo.jsEngine') ? project.property('expo.jsEngine') == "hermes" : true
-    if (useHermes) {
-        dependencies {
-            implementation("com.facebook.react:hermes-android")
-        }
-    } else {
-        dependencies {
-            implementation jscFlavor
-        }
-    }
-}'''
-
-new_content = re.sub(pattern, replacement, content, count=1, flags=re.MULTILINE)
-
-with open('build.gradle', 'w') as f:
-    f.write(new_content)
-print("Patched build.gradle successfully")
-PYEOF
+      run: python3 scripts/patch_build_gradle.py android/app/build.gradle
 
     - name: Grant gradlew execute permission
       run: chmod +x android/gradlew
