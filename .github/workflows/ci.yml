@@ -87,6 +87,20 @@ jobs:
           echo "Warning: $EXPO_APP_GRADLE not found"
         fi
 
+    - name: Patch app build.gradle for hermesenabled property
+      run: |
+        APP_GRADLE="android/app/build.gradle"
+        if [ -f "$APP_GRADLE" ]; then
+          # Move useHermes definition inside dependencies closure with lowercase property name
+          sed -i "/def useHermes = project.hasProperty('hermesEnabled')/d" "$APP_GRADLE"
+          sed -i "/def useHermes = project.hasProperty('hermesenabled')/d" "$APP_GRADLE"
+          # Add useHermes definition inside dependencies block with lowercase property name
+          sed -i '/dependencies {/a\    def useHermes = project.hasProperty('\''hermesenabled'\'') ? project.property('\''hermesenabled'\'').toBoolean() : false' "$APP_GRADLE"
+          echo "Patched $APP_GRADLE"
+        else
+          echo "Warning: $APP_GRADLE not found"
+        fi
+
     - name: Grant gradlew execute permission
       run: chmod +x android/gradlew
 
