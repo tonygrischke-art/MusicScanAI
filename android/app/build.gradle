@@ -146,7 +146,7 @@ android {
     }
 }
 
-def useHermes = findProperty('hermesEnabled')?.toBoolean() ?: false
+def useHermes = (project.hasProperty('hermesEnabled') ? project.property('hermesEnabled') : 'false').toBoolean()
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
