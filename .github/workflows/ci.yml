@@ -87,6 +87,8 @@ jobs:
         ndk-version: r27c
         cache: gradle
         cache-key: ${{ runner.os }}-android-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+        emulator: false
+        disable-tools: true
 
     - name: Accept Android SDK licenses
       run: yes | sdkmanager --licenses || true
