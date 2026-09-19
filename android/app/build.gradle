@@ -150,7 +150,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-    def useHermes = project.hasProperty('hermesEnabled') ? project.property('hermesEnabled').toBoolean() : false
+    def useHermes = project.hasProperty('hermesenabled') ? project.property('hermesenabled').toBoolean() : false
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
