@@ -12,6 +12,7 @@ import {
   PanResponderGestureState,
   Text,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import Svg, { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
 import { MoodCoordinate, MOOD_PRESETS } from '../types/journey';
 
@@ -81,6 +82,9 @@ export const MoodCanvas: React.FC<MoodCanvasProps> = ({
         const distToEnd = Math.hypot(locationX - end.x, locationY - end.y);
 
         setDragging(distToStart < distToEnd ? 'start' : 'end');
+        
+        // Haptic feedback on grab
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       },
       onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
         if (!dragging) return;
@@ -93,9 +97,17 @@ export const MoodCanvas: React.FC<MoodCanvasProps> = ({
         } else {
           onEndMoodChange(mood);
         }
+
+        // Haptic feedback every ~40px of movement
+        const distance = Math.sqrt(gestureState.dx * gestureState.dx + gestureState.dy * gestureState.dy);
+        if (distance > 40) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
       },
       onPanResponderRelease: () => {
         setDragging(null);
+        // Success haptic on release
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       },
     })
   ).current;

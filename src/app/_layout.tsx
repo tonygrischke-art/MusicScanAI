@@ -10,6 +10,8 @@ import { useLibrary } from '../stores/useLibraryStore';
 import { useAudioStore } from '../stores/useAudioStore';
 import { useAIStore } from '../stores/useAIStore';
 import { useJourneyStore } from '../store/journeyStore';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { initCrashReporting } from '../services/CrashReportingService';
 import { setupAudioService } from '../services/AudioService';
 import { loadJourneysFromStorage } from '../store/journeyStore';
 import { MINI_PLAYER_HEIGHT, TAB_BAR_HEIGHT } from '../utils/constants';
@@ -49,6 +51,9 @@ function AppContent() {
 
   useEffect(() => {
     const init = async () => {
+      // Initialize crash reporting FIRST
+      initCrashReporting();
+      
       await setupAudioService();
       refreshLibrary();
       loadSettings();
@@ -118,11 +123,13 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={styles.container}>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 

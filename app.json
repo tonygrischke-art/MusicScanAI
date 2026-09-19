@@ -7,6 +7,30 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableHermes": false
+          }
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "permissions": {
+            "isAccessMediaLocationEnabled": true
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "MusicScan AI needs access to your photos to set album artwork."
+        }
+      ]
+    ],
     "scheme": "musicscanai",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -44,22 +68,6 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": [
-      [
-        "expo-media-library",
-        {
-          "permissions": {
-            "isAccessMediaLocationEnabled": true
-          }
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "MusicScan AI needs access to your photos to set album artwork."
-        }
-      ]
-    ],
     "owner": "grischke",
     "extra": {
       "eas": {
