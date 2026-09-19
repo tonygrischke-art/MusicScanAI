@@ -38,11 +38,41 @@ export default function PlaylistDetailScreen() {
   const playlist = getPlaylistById(id || '');
   const tracks = playlist ? getPlaylistTracks(playlist.id) : [];
 
+  const collage = playlist?.artworkCollage ?? [];
+  const artworkColors = collage.length > 0 ? collage : ['#151520', '#1E1E2E', '#2D2D44', '#3D3D54'];
+
+  const collageColors = [
+    artworkColors[0] || '#151520',
+    artworkColors[1] || '#1E1E2E',
+    artworkColors[2] || '#2D2D44',
+    artworkColors[3] || '#3D3D54',
+  ];
+
+  const totalDuration = tracks.reduce((acc, t) => acc + t.duration, 0);
+
   React.useEffect(() => {
     if (playlist) {
       setNewName(playlist.name);
     }
   }, [playlist?.id]);
+
+  const handleRemoveTrack = useCallback((trackId: string) => {
+    if (playlist) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      removeTrackFromPlaylist(playlist.id, trackId);
+    }
+  }, [playlist, removeTrackFromPlaylist]);
+
+  const renderTrack = useCallback(({ item, index }: { item: Track; index: number }) => (
+    <Animated.View entering={FadeIn.duration(200).delay(index * 20)} layout={Layout.springify()}>
+      <TrackRow
+        track={item}
+        onPress={() => playQueue(tracks, index)}
+        onLongPress={() => handleRemoveTrack(item.id)}
+        isPlaying={currentTrack?.id === item.id && isPlaying}
+      />
+    </Animated.View>
+  ), [tracks, playQueue, currentTrack, isPlaying, handleRemoveTrack]);
 
   const handlePlay = useCallback(() => {
     if (tracks.length > 0) {
@@ -86,13 +116,6 @@ export default function PlaylistDetailScreen() {
     }
   }, [newName, playlist, updatePlaylist]);
 
-  const handleRemoveTrack = useCallback((trackId: string) => {
-    if (playlist) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      removeTrackFromPlaylist(playlist.id, trackId);
-    }
-  }, [playlist, removeTrackFromPlaylist]);
-
   if (!playlist) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -100,30 +123,6 @@ export default function PlaylistDetailScreen() {
       </View>
     );
   }
-
-  const artworkColors = playlist.artworkCollage.length > 0
-    ? playlist.artworkCollage
-    : ['#151520', '#1E1E2E', '#2D2D44', '#3D3D54'];
-
-  const collageColors = [
-    artworkColors[0] || '#151520',
-    artworkColors[1] || '#1E1E2E',
-    artworkColors[2] || '#2D2D44',
-    artworkColors[3] || '#3D3D54',
-  ];
-
-  const totalDuration = tracks.reduce((acc, t) => acc + t.duration, 0);
-
-  const renderTrack = useCallback(({ item, index }: { item: Track; index: number }) => (
-    <Animated.View entering={FadeIn.duration(200).delay(index * 20)} layout={Layout.springify()}>
-      <TrackRow
-        track={item}
-        onPress={() => playQueue(tracks, index)}
-        onLongPress={() => handleRemoveTrack(item.id)}
-        isPlaying={currentTrack?.id === item.id && isPlaying}
-      />
-    </Animated.View>
-  ), [tracks, playQueue, currentTrack, isPlaying, handleRemoveTrack]);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>

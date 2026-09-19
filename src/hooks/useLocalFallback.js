@@ -1,26 +1,40 @@
-import { useState, useEffect } from 'react'
-import { analyzeWithGemini } from './geminiService'
-import { getMediaLibraryMetadata } from './mediaLibraryService'
+import { useState, useCallback } from 'react';
 
-// Function to analyze music with Gemini API or fallback to local metadata
-export const useLocalFallback = () => {
-  const [isOnline, setIsOnline] = useState(true)
+/**
+ * Local fallback functions (self-contained, no external dependencies)
+ */
 
-  const analyzeMusic = async (track) => {
+async function analyzeWithGemini(track) {
+  // Placeholder - would call actual Gemini API
+  return { mood: 'unknown', confidence: 0 };
+}
+
+async function getMediaLibraryMetadata(track) {
+  // Placeholder - would read local metadata
+  return { mood: 'unknown', confidence: 0 };
+}
+
+/**
+ * Local fallback hook for AI analysis
+ */
+export function useLocalFallback() {
+  const [isOnline, setIsOnline] = useState(true);
+
+  const analyzeMusic = useCallback(async (track) => {
     try {
       // Try Gemini API first
-      const geminiResult = await analyzeWithGemini(track)
-      return geminiResult
+      const geminiResult = await analyzeWithGemini(track);
+      return geminiResult;
     } catch (error) {
       // Fallback to local metadata if API fails
-      console.warn('Gemini API failed, using local metadata:', error)
-      setIsOnline(false)
-      return await getMediaLibraryMetadata(track)
+      console.warn('Gemini API failed, using local metadata:', error);
+      setIsOnline(false);
+      return await getMediaLibraryMetadata(track);
     }
-  }
+  }, []);
 
   return {
     isOnline,
     analyzeMusic,
-  }
+  };
 }

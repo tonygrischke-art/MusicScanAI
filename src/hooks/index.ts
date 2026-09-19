@@ -2,3 +2,8 @@ export { useAudio } from './useAudio';
 export { useScan } from './useScan';
 export { useAI } from './useAI';
 export { useLibrary } from './useLibrary';
+export { useAudioPersistence } from './useAudioPersistence';
+export { useLocalFallback } from './useLocalFallback';
+export { useMMKVZustandSync } from './useMMKVZustandSync';
+export { useDreamPlaylist } from './useDreamPlaylist';
+export { useShakeDetection } from './useShakeToShuffle';
