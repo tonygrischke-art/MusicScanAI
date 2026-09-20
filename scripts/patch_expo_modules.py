@@ -91,22 +91,21 @@ if os.path.isfile(libs_toml):
     for line in content.split('\n'):
         if 'androidx' in line and ('core' in line or 'activity' in line or 'fragment' in line or 'lifecycle' in line):
             print(f"    {line.strip()}")
-    # Downgrade androidx.core to 1.15.0
-    if 'androidx-core = "1.17.0"' in content:
-        content = content.replace('androidx-core = "1.17.0"', 'androidx-core = "1.15.0"')
-        print(f"  Downgraded androidx-core to 1.15.0")
-    else:
-        print(f"  androidx-core = \"1.17.0\" NOT FOUND!")
-    # Also check for androidx-activity, androidx-fragment, androidx-lifecycle
-    if 'androidx-activity = "1.17.0"' in content:
-        content = content.replace('androidx-activity = "1.17.0"', 'androidx-activity = "1.15.0"')
-        print(f"  Downgraded androidx-activity to 1.15.0")
-    if 'androidx-fragment = "1.17.0"' in content:
-        content = content.replace('androidx-fragment = "1.17.0"', 'androidx-fragment = "1.15.0"')
-        print(f"  Downgraded androidx-fragment to 1.15.0")
-    if 'androidx-lifecycle = "1.17.0"' in content:
-        content = content.replace('androidx-lifecycle = "1.17.0"', 'androidx-lifecycle = "1.15.0"')
-        print(f"  Downgraded androidx-lifecycle to 1.15.0")
+    # Use regex to find and replace androidx versions
+    import re
+    # Match patterns like: androidx-core = "1.17.0" or androidx-core="1.17.0"
+    patterns = [
+        (r'androidx-core\s*=\s*"1\.17\.0"', 'androidx-core = "1.15.0"'),
+        (r'androidx-activity\s*=\s*"1\.17\.0"', 'androidx-activity = "1.15.0"'),
+        (r'androidx-fragment\s*=\s*"1\.17\.0"', 'androidx-fragment = "1.15.0"'),
+        (r'androidx-lifecycle\s*=\s*"1\.17\.0"', 'androidx-lifecycle = "1.15.0"'),
+    ]
+    for pattern, replacement in patterns:
+        if re.search(pattern, content):
+            content = re.sub(pattern, replacement, content)
+            print(f"  Replaced: {pattern} -> {replacement}")
+        else:
+            print(f"  Pattern NOT FOUND: {pattern}")
     with open(libs_toml, 'w') as fp:
         fp.write(content)
     # Verify after write
