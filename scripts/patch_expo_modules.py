@@ -80,28 +80,49 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch app build.gradle to force androidx.core versions compatible with AGP 8.6.0 / compileSdk 35
+# Patch root build.gradle to add resolutionStrategy for all subprojects
+root_gradle = 'android/build.gradle'
+print(f"\n=== Checking root build.gradle ===")
+print(f"  Exists: {os.path.isfile(root_gradle)}")
+if os.path.isfile(root_gradle):
+    with open(root_gradle, 'r') as fp:
+        content = fp.read()
+    # Add resolutionStrategy to subprojects block
+    if 'resolutionStrategy' not in content:
+        if 'subprojects {' in content:
+            resolution_strategy = '''
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.15.0'
+            force 'androidx.core:core-ktx:1.15.0'
+        }
+    }
+'''
+            content = content.replace('subprojects {', resolution_strategy)
+            print(f"  Added resolutionStrategy to root build.gradle")
+        elif 'allprojects {' in content:
+            resolution_strategy = '''
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.15.0'
+            force 'androidx.core:core-ktx:1.15.0'
+        }
+    }
+'''
+            content = content.replace('allprojects {', resolution_strategy)
+            print(f"  Added resolutionStrategy to root build.gradle (allprojects)")
+    with open(root_gradle, 'w') as fp:
+        fp.write(content)
+
+# Patch app build.gradle to ensure compileSdk is 35
 app_gradle = 'android/app/build.gradle'
 print(f"\n=== Checking app build.gradle ===")
 print(f"  Exists: {os.path.isfile(app_gradle)}")
 if os.path.isfile(app_gradle):
     with open(app_gradle, 'r') as fp:
         content = fp.read()
-    # Add resolutionStrategy to force androidx.core versions
-    if 'resolutionStrategy' not in content:
-        if 'dependencies {' in content:
-            resolution_strategy = '''
-configurations.all {
-    resolutionStrategy {
-        force 'androidx.core:core:1.15.0'
-        force 'androidx.core:core-ktx:1.15.0'
-    }
-}
-
-'''
-            content = content.replace('dependencies {', resolution_strategy + 'dependencies {')
-            print(f"  Added resolutionStrategy for androidx.core 1.15.0")
-    # Also ensure compileSdk is 35
     if 'compileSdkVersion 36' in content:
         content = content.replace('compileSdkVersion 36', 'compileSdkVersion 35')
         print(f"  Changed compileSdkVersion to 35")
