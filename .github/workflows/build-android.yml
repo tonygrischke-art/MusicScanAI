@@ -66,13 +66,22 @@ jobs:
       run: |
         SETTINGS_GRADLE="android/settings.gradle"
         if [ -f "$SETTINGS_GRADLE" ]; then
-          # Add pluginManagement block at the top if not present
-          if ! grep -q "pluginManagement" "$SETTINGS_GRADLE"; then
-            sed -i '1i\pluginManagement {\n    repositories {\n        gradlePluginPortal()\n        google()\n        mavenCentral()\n    }\n    plugins {\n        id "expo-module-gradle-plugin" version "0.5.0"\n    }\n}\n' "$SETTINGS_GRADLE"
-            echo "Added pluginManagement to $SETTINGS_GRADLE"
-          else
-            echo "pluginManagement already exists in $SETTINGS_GRADLE"
-          fi
+          # Create pluginManagement block and prepend to settings.gradle
+          cat > /tmp/plugin_mgmt.gradle << 'EOF'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+    plugins {
+        id "expo-module-gradle-plugin" version "0.5.0"
+    }
+}
+EOF
+          cat /tmp/plugin_mgmt.gradle "$SETTINGS_GRADLE" > /tmp/new_settings.gradle
+          mv /tmp/new_settings.gradle "$SETTINGS_GRADLE"
+          echo "Added pluginManagement to $SETTINGS_GRADLE"
         else
           echo "Warning: $SETTINGS_GRADLE not found"
         fi
@@ -81,7 +90,6 @@ jobs:
       run: |
         EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
         if [ -f "$EXPO_APP_GRADLE" ]; then
-          # Add compileSdkVersion if missing
           if ! grep -q "compileSdkVersion" "$EXPO_APP_GRADLE"; then
             sed -i '/^android {/a\    compileSdkVersion 34' "$EXPO_APP_GRADLE"
             echo "Added compileSdkVersion to $EXPO_APP_GRADLE"
