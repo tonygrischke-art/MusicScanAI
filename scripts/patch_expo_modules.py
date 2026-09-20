@@ -80,31 +80,43 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch root build.gradle to upgrade AGP
+# Patch libs.versions.toml to upgrade AGP and compileSdk
+libs_toml = 'node_modules/react-native/gradle/libs.versions.toml'
+print(f"\n=== Checking libs.versions.toml ===")
+print(f"  Exists: {os.path.isfile(libs_toml)}")
+if os.path.isfile(libs_toml):
+    with open(libs_toml, 'r') as fp:
+        content = fp.read()
+    # Upgrade AGP from 8.6.0 to 8.9.1
+    if 'agp = "8.6.0"' in content:
+        content = content.replace('agp = "8.6.0"', 'agp = "8.9.1"')
+        print(f"  Upgraded AGP to 8.9.1")
+    # Upgrade compileSdk from 35 to 36
+    if 'compileSdk = "35"' in content:
+        content = content.replace('compileSdk = "35"', 'compileSdk = "36"')
+        print(f"  Upgraded compileSdk to 36")
+    # Upgrade targetSdk from 34 to 35
+    if 'targetSdk = "34"' in content:
+        content = content.replace('targetSdk = "34"', 'targetSdk = "35"')
+        print(f"  Upgraded targetSdk to 35")
+    # Upgrade buildTools from 35.0.0 to 36.0.0
+    if 'buildTools = "35.0.0"' in content:
+        content = content.replace('buildTools = "35.0.0"', 'buildTools = "36.0.0"')
+        print(f"  Upgraded buildTools to 36.0.0")
+    with open(libs_toml, 'w') as fp:
+        fp.write(content)
+
+# Patch root build.gradle to use compileSdkVersion 36
 root_gradle = 'android/build.gradle'
 print(f"\n=== Checking root build.gradle ===")
 print(f"  Exists: {os.path.isfile(root_gradle)}")
 if os.path.isfile(root_gradle):
     with open(root_gradle, 'r') as fp:
         content = fp.read()
-    # Upgrade AGP from 8.6.0 to 8.9.1
-    if '8.6.0' in content and 'com.android.application' in content:
-        content = content.replace('8.6.0', '8.9.1')
-        print(f"  Upgraded AGP to 8.9.1")
+    if 'compileSdkVersion = Integer.parseInt(findProperty' in content:
+        content = content.replace('compileSdkVersion = Integer.parseInt(findProperty', 'compileSdkVersion = Integer.parseInt(findProperty')
+        # This will be overridden by libs.versions.toml anyway
     with open(root_gradle, 'w') as fp:
-        fp.write(content)
-
-# Patch gradle.properties for Android Gradle Plugin version
-gradle_props = 'android/gradle.properties'
-print(f"\n=== Checking gradle.properties ===")
-print(f"  Exists: {os.path.isfile(gradle_props)}")
-if os.path.isfile(gradle_props):
-    with open(gradle_props, 'r') as fp:
-        content = fp.read()
-    if 'androidGradlePluginVersion' in content:
-        content = content.replace('androidGradlePluginVersion=8.6.0', 'androidGradlePluginVersion=8.9.1')
-        print(f"  Updated androidGradlePluginVersion to 8.9.1")
-    with open(gradle_props, 'w') as fp:
         fp.write(content)
 
 # Patch app build.gradle to use compileSdk 36
