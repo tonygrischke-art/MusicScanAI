@@ -1,6 +1,5 @@
 import os
 import glob
-import re
 
 print("=== Patching expo modules ===")
 expo_modules = glob.glob('node_modules/expo-*/android/build.gradle') + glob.glob('node_modules/@expo/*/android/build.gradle')
@@ -81,7 +80,7 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch libs.versions.toml to use androidx.core 1.15.0 (compatible with AGP 8.6.0 / compileSdk 35)
+# Patch libs.versions.toml to add androidx-core version 1.15.0 (compatible with AGP 8.6.0 / compileSdk 35)
 libs_toml = 'node_modules/react-native/gradle/libs.versions.toml'
 print(f"\n=== Checking libs.versions.toml ===")
 print(f"  Exists: {os.path.isfile(libs_toml)}")
@@ -92,12 +91,32 @@ if os.path.isfile(libs_toml):
     for line in content.split('\n'):
         if 'androidx' in line:
             print(f"    {line.strip()}")
-    # Replace any androidx version that's 1.17.0 with 1.15.0
-    # The format is: name = "1.17.0" or name = "1.17.0" or name="1.17.0"
+    # Add androidx-core = "1.15.0" to versions section if not present
+    if 'androidx-core =' not in content:
+        # Add after the last androidx version line
+        lines = content.split('\n')
+        new_lines = []
+        added = False
+        for line in lines:
+            new_lines.append(line)
+            if line.strip().startswith('androidx-tracing =') and not added:
+                new_lines.append('androidx-core = "1.15.0"')
+                new_lines.append('androidx-activity = "1.15.0"')
+                new_lines.append('androidx-fragment = "1.15.0"')
+                new_lines.append('androidx-lifecycle = "1.15.0"')
+                print(f"  Added androidx-core, activity, fragment, lifecycle = 1.15.0")
+                added = True
+        content = '\n'.join(new_lines)
+        with open(libs_toml, 'w') as fp:
+            fp.write(content)
+        print(f"  Added androidx-core and related to versions section")
+    else:
+        print(f"  androidx-core already present")
+    # Also downgrade any 1.17.0 to 1.15.0 for existing entries
     lines = content.split('\n')
     new_lines = []
     for line in lines:
-        if 'androidx' in line and '1.17.0' in line:
+        if '1.17.0' in line and ('androidx' in line):
             new_line = line.replace('1.17.0', '1.15.0')
             print(f"  Replaced: {line.strip()} -> {new_line.strip()}")
             new_lines.append(new_line)
