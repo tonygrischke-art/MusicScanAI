@@ -35,8 +35,8 @@ for f in expo_modules:
             in_plugins = False
     content = '\n'.join(new_lines)
     if 'compileSdkVersion' not in content:
-        content = content.replace('android {', 'android {\n    compileSdkVersion 34', 1)
-        print(f"    Added compileSdkVersion")
+        content = content.replace('android {', 'android {\n    compileSdkVersion 36', 1)
+        print(f"    Added compileSdkVersion 36")
     with open(f, 'w') as fp:
         fp.write(content)
 
@@ -80,28 +80,47 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch app build.gradle to force androidx.core versions compatible with compileSdk 35
+# Patch root build.gradle to upgrade AGP
+root_gradle = 'android/build.gradle'
+print(f"\n=== Checking root build.gradle ===")
+print(f"  Exists: {os.path.isfile(root_gradle)}")
+if os.path.isfile(root_gradle):
+    with open(root_gradle, 'r') as fp:
+        content = fp.read()
+    # Upgrade AGP from 8.6.0 to 8.9.1
+    if '8.6.0' in content and 'com.android.application' in content:
+        content = content.replace('8.6.0', '8.9.1')
+        print(f"  Upgraded AGP to 8.9.1")
+    with open(root_gradle, 'w') as fp:
+        fp.write(content)
+
+# Patch gradle.properties for Android Gradle Plugin version
+gradle_props = 'android/gradle.properties'
+print(f"\n=== Checking gradle.properties ===")
+print(f"  Exists: {os.path.isfile(gradle_props)}")
+if os.path.isfile(gradle_props):
+    with open(gradle_props, 'r') as fp:
+        content = fp.read()
+    if 'androidGradlePluginVersion' in content:
+        content = content.replace('androidGradlePluginVersion=8.6.0', 'androidGradlePluginVersion=8.9.1')
+        print(f"  Updated androidGradlePluginVersion to 8.9.1")
+    with open(gradle_props, 'w') as fp:
+        fp.write(content)
+
+# Patch app build.gradle to use compileSdk 36
 app_gradle = 'android/app/build.gradle'
 print(f"\n=== Checking app build.gradle ===")
 print(f"  Exists: {os.path.isfile(app_gradle)}")
 if os.path.isfile(app_gradle):
     with open(app_gradle, 'r') as fp:
         content = fp.read()
-    # Add resolutionStrategy to force androidx.core versions
-    if 'resolutionStrategy' not in content:
-        # Find the dependencies block and add resolutionStrategy before it
-        if 'dependencies {' in content:
-            resolution_strategy = '''
-configurations.all {
-    resolutionStrategy {
-        force 'androidx.core:core:1.15.0'
-        force 'androidx.core:core-ktx:1.15.0'
-    }
-}
-
-'''
-            content = content.replace('dependencies {', resolution_strategy + 'dependencies {')
-            print(f"  Added resolutionStrategy for androidx.core")
+    if 'compileSdkVersion' in content:
+        content = content.replace('compileSdkVersion 35', 'compileSdkVersion 36')
+        content = content.replace('compileSdkVersion 34', 'compileSdkVersion 36')
+        print(f"  Updated compileSdkVersion to 36")
+    else:
+        content = content.replace('android {', 'android {\n    compileSdkVersion 36', 1)
+        print(f"  Added compileSdkVersion 36")
     with open(app_gradle, 'w') as fp:
         fp.write(content)
 
