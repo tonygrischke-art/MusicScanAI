@@ -32,4 +32,19 @@ for f in expo_modules:
         content = content.replace('android {', 'android {\n    compileSdkVersion 34', 1)
     with open(f, 'w') as fp:
         fp.write(content)
+
+# Also patch expo-modules-core build.gradle for hermesEnabled reference
+core_gradle = 'node_modules/expo-modules-core/android/build.gradle'
+if os.path.isfile(core_gradle):
+    with open(core_gradle, 'r') as fp:
+        content = fp.read()
+    # Fix the hermesEnabled reference on app project
+    content = content.replace(
+        'USE_HERMES = appProject?.hermesEnabled?.toBoolean() || appProject?.ext?.react?.enableHermes?.toBoolean()',
+        'USE_HERMES = (appProject?.ext?.react?.enableHermes?.toBoolean() ?: false)'
+    )
+    with open(core_gradle, 'w') as fp:
+        fp.write(content)
+    print(f"Patched {core_gradle} for hermesEnabled")
+
 print("Patched all expo modules")
