@@ -1,19 +1,24 @@
 import os
 import glob
 
+print("=== Patching expo modules ===")
 expo_modules = glob.glob('node_modules/expo-*/android/build.gradle') + glob.glob('node_modules/@expo/*/android/build.gradle')
+print(f"Found {len(expo_modules)} expo module build.gradle files")
 for f in expo_modules:
     if not os.path.isfile(f):
+        print(f"  SKIP (not file): {f}")
         continue
     with open(f, 'r') as fp:
         content = fp.read()
     if 'expo-module-gradle-plugin' not in content:
+        print(f"  SKIP (no plugin): {f}")
         continue
-    print(f"Patching {f}")
+    print(f"  PATCHING: {f}")
     lines = content.split('\n')
     new_lines = []
     for line in lines:
         if 'expo-module-gradle-plugin' in line:
+            print(f"    Removed: {line.strip()}")
             continue
         new_lines.append(line)
     content = '\n'.join(new_lines)
@@ -26,27 +31,34 @@ for f in expo_modules:
             in_plugins = True
         elif in_plugins and line.strip() == '}':
             new_lines.append('apply from: "${project.rootDir}/../node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"')
+            print(f"    Added apply after plugins block")
             in_plugins = False
     content = '\n'.join(new_lines)
     if 'compileSdkVersion' not in content:
         content = content.replace('android {', 'android {\n    compileSdkVersion 34', 1)
+        print(f"    Added compileSdkVersion")
     with open(f, 'w') as fp:
         fp.write(content)
 
 # Also patch expo-modules-core build.gradle for hermesEnabled reference
 core_gradle = 'node_modules/expo-modules-core/android/build.gradle'
+print(f"\n=== Checking expo-modules-core ===")
+print(f"  Exists: {os.path.isfile(core_gradle)}")
 if os.path.isfile(core_gradle):
     with open(core_gradle, 'r') as fp:
         content = fp.read()
-    # Fix the hermesEnabled reference on app project - exact match
     old = 'USE_HERMES = appProject?.hermesEnabled?.toBoolean() || appProject?.ext?.react?.enableHermes?.toBoolean()'
     new = 'USE_HERMES = (appProject?.ext?.react?.enableHermes?.toBoolean() ?: false)'
     if old in content:
         content = content.replace(old, new)
-        print(f"Patched {core_gradle} for hermesEnabled")
+        print(f"  PATTERN FOUND - patching hermesEnabled")
     else:
-        print(f"Pattern not found in {core_gradle}")
+        print(f"  PATTERN NOT FOUND!")
+        # Print the relevant lines for debugging
+        for i, line in enumerate(content.split('\n'), 1):
+            if 'hermesEnabled' in line or 'USE_HERMES' in line:
+                print(f"    Line {i}: {line.strip()}")
     with open(core_gradle, 'w') as fp:
         fp.write(content)
 
-print("Patched all expo modules")
+print("=== Done ===")
