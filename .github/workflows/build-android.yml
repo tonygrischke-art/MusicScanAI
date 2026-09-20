@@ -62,28 +62,22 @@ jobs:
         kotlin.code.style=official
         EOF
 
-    - name: Add expo-module-gradle-plugin to pluginManagement
+    - name: Add expo-module-gradle-plugin to root buildscript
       run: |
-        SETTINGS_GRADLE="android/settings.gradle"
-        if [ -f "$SETTINGS_GRADLE" ]; then
-          # Create pluginManagement block and prepend to settings.gradle
-          cat > /tmp/plugin_mgmt.gradle << 'EOF'
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
-    plugins {
-        id "expo-module-gradle-plugin" version "0.5.0"
-    }
-}
-EOF
-          cat /tmp/plugin_mgmt.gradle "$SETTINGS_GRADLE" > /tmp/new_settings.gradle
-          mv /tmp/new_settings.gradle "$SETTINGS_GRADLE"
-          echo "Added pluginManagement to $SETTINGS_GRADLE"
+        ROOT_GRADLE="android/build.gradle"
+        if [ -f "$ROOT_GRADLE" ]; then
+          # Add expo-module-gradle-plugin to buildscript dependencies
+          if ! grep -q "expo-module-gradle-plugin" "$ROOT_GRADLE"; then
+            sed -i '/dependencies {/a\        classpath("org.expo:expo-module-gradle-plugin:0.5.0")' "$ROOT_GRADLE"
+            echo "Added expo-module-gradle-plugin to $ROOT_GRADLE"
+          fi
+          # Also ensure gradlePluginPortal is in repositories
+          if ! grep -q "gradlePluginPortal" "$ROOT_GRADLE"; then
+            sed -i '/repositories {/a\        gradlePluginPortal()' "$ROOT_GRADLE"
+            echo "Added gradlePluginPortal to $ROOT_GRADLE"
+          fi
         else
-          echo "Warning: $SETTINGS_GRADLE not found"
+          echo "Warning: $ROOT_GRADLE not found"
         fi
 
     - name: Patch expo-application build.gradle for compileSdkVersion
