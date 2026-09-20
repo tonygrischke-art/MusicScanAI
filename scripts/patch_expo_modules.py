@@ -87,24 +87,43 @@ print(f"  Exists: {os.path.isfile(libs_toml)}")
 if os.path.isfile(libs_toml):
     with open(libs_toml, 'r') as fp:
         content = fp.read()
+    print(f"  Original content snippet (agp line):")
+    for line in content.split('\n'):
+        if 'agp' in line or 'compileSdk' in line or 'targetSdk' in line or 'buildTools' in line:
+            print(f"    {line.strip()}")
     # Upgrade AGP from 8.6.0 to 8.9.1
     if 'agp = "8.6.0"' in content:
         content = content.replace('agp = "8.6.0"', 'agp = "8.9.1"')
         print(f"  Upgraded AGP to 8.9.1")
+    else:
+        print(f"  agp = \"8.6.0\" NOT FOUND!")
     # Upgrade compileSdk from 35 to 36
     if 'compileSdk = "35"' in content:
         content = content.replace('compileSdk = "35"', 'compileSdk = "36"')
         print(f"  Upgraded compileSdk to 36")
+    else:
+        print(f"  compileSdk = \"35\" NOT FOUND!")
     # Upgrade targetSdk from 34 to 35
     if 'targetSdk = "34"' in content:
         content = content.replace('targetSdk = "34"', 'targetSdk = "35"')
         print(f"  Upgraded targetSdk to 35")
+    else:
+        print(f"  targetSdk = \"34\" NOT FOUND!")
     # Upgrade buildTools from 35.0.0 to 36.0.0
     if 'buildTools = "35.0.0"' in content:
         content = content.replace('buildTools = "35.0.0"', 'buildTools = "36.0.0"')
         print(f"  Upgraded buildTools to 36.0.0")
+    else:
+        print(f"  buildTools = \"35.0.0\" NOT FOUND!")
     with open(libs_toml, 'w') as fp:
         fp.write(content)
+    # Verify after write
+    with open(libs_toml, 'r') as fp:
+        content = fp.read()
+    print(f"  After write content snippet:")
+    for line in content.split('\n'):
+        if 'agp' in line or 'compileSdk' in line or 'targetSdk' in line or 'buildTools' in line:
+            print(f"    {line.strip()}")
 
 # Patch root build.gradle to use compileSdkVersion 36
 root_gradle = 'android/build.gradle'
@@ -113,9 +132,6 @@ print(f"  Exists: {os.path.isfile(root_gradle)}")
 if os.path.isfile(root_gradle):
     with open(root_gradle, 'r') as fp:
         content = fp.read()
-    if 'compileSdkVersion = Integer.parseInt(findProperty' in content:
-        content = content.replace('compileSdkVersion = Integer.parseInt(findProperty', 'compileSdkVersion = Integer.parseInt(findProperty')
-        # This will be overridden by libs.versions.toml anyway
     with open(root_gradle, 'w') as fp:
         fp.write(content)
 
