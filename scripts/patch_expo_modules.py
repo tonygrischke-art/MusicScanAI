@@ -80,4 +80,29 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
+# Patch app build.gradle to force androidx.core versions compatible with compileSdk 35
+app_gradle = 'android/app/build.gradle'
+print(f"\n=== Checking app build.gradle ===")
+print(f"  Exists: {os.path.isfile(app_gradle)}")
+if os.path.isfile(app_gradle):
+    with open(app_gradle, 'r') as fp:
+        content = fp.read()
+    # Add resolutionStrategy to force androidx.core versions
+    if 'resolutionStrategy' not in content:
+        # Find the dependencies block and add resolutionStrategy before it
+        if 'dependencies {' in content:
+            resolution_strategy = '''
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core:1.15.0'
+        force 'androidx.core:core-ktx:1.15.0'
+    }
+}
+
+'''
+            content = content.replace('dependencies {', resolution_strategy + 'dependencies {')
+            print(f"  Added resolutionStrategy for androidx.core")
+    with open(app_gradle, 'w') as fp:
+        fp.write(content)
+
 print("=== Done ===")
