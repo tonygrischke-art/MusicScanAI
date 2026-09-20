@@ -38,13 +38,15 @@ core_gradle = 'node_modules/expo-modules-core/android/build.gradle'
 if os.path.isfile(core_gradle):
     with open(core_gradle, 'r') as fp:
         content = fp.read()
-    # Fix the hermesEnabled reference on app project
-    content = content.replace(
-        'USE_HERMES = appProject?.hermesEnabled?.toBoolean() || appProject?.ext?.react?.enableHermes?.toBoolean()',
-        'USE_HERMES = (appProject?.ext?.react?.enableHermes?.toBoolean() ?: false)'
-    )
+    # Fix the hermesEnabled reference on app project - exact match
+    old = 'USE_HERMES = appProject?.hermesEnabled?.toBoolean() || appProject?.ext?.react?.enableHermes?.toBoolean()'
+    new = 'USE_HERMES = (appProject?.ext?.react?.enableHermes?.toBoolean() ?: false)'
+    if old in content:
+        content = content.replace(old, new)
+        print(f"Patched {core_gradle} for hermesEnabled")
+    else:
+        print(f"Pattern not found in {core_gradle}")
     with open(core_gradle, 'w') as fp:
         fp.write(content)
-    print(f"Patched {core_gradle} for hermesEnabled")
 
 print("Patched all expo modules")
