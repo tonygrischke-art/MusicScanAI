@@ -71,8 +71,9 @@ jobs:
             # Remove the plugin id line
             sed -i "/id 'expo-module-gradle-plugin'/d" "$f"
             sed -i '/id "expo-module-gradle-plugin"/d' "$f"
-            # Add apply from ExpoModulesCorePlugin.gradle after plugins block
-            sed -i '/^plugins {/a\apply from: "${project.rootDir}/../node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"' "$f"
+            # Add apply from ExpoModulesCorePlugin.gradle AFTER plugins block
+            # Find the line with closing brace of plugins block and insert after it
+            sed -i '/^plugins {/,/^}/ { /^}/a\apply from: "${project.rootDir}\/..\/node_modules\/expo-modules-core\/android\/ExpoModulesCorePlugin.gradle"' "$f"
             # Add compileSdkVersion if missing
             if ! grep -q "compileSdkVersion" "$f"; then
               sed -i '/^android {/a\    compileSdkVersion 34' "$f"
