@@ -54,11 +54,30 @@ if os.path.isfile(core_gradle):
         print(f"  PATTERN FOUND - patching hermesEnabled")
     else:
         print(f"  PATTERN NOT FOUND!")
-        # Print the relevant lines for debugging
         for i, line in enumerate(content.split('\n'), 1):
             if 'hermesEnabled' in line or 'USE_HERMES' in line:
                 print(f"    Line {i}: {line.strip()}")
     with open(core_gradle, 'w') as fp:
+        fp.write(content)
+
+# Also patch react-native-reanimated build.gradle for hermesEnabled reference
+reanimated_gradle = 'node_modules/react-native-reanimated/android/build.gradle'
+print(f"\n=== Checking react-native-reanimated ===")
+print(f"  Exists: {os.path.isfile(reanimated_gradle)}")
+if os.path.isfile(reanimated_gradle):
+    with open(reanimated_gradle, 'r') as fp:
+        content = fp.read()
+    old = 'appProject?.hermesEnabled?.toBoolean() || appProject?.ext?.react?.enableHermes?.toBoolean()'
+    new = '(appProject?.ext?.react?.enableHermes?.toBoolean() ?: false)'
+    if old in content:
+        content = content.replace(old, new)
+        print(f"  PATTERN FOUND - patching hermesEnabled")
+    else:
+        print(f"  PATTERN NOT FOUND!")
+        for i, line in enumerate(content.split('\n'), 1):
+            if 'hermesEnabled' in line:
+                print(f"    Line {i}: {line.strip()}")
+    with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
 print("=== Done ===")
