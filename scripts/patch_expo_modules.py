@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 
 print("=== Patching expo modules ===")
 expo_modules = glob.glob('node_modules/expo-*/android/build.gradle') + glob.glob('node_modules/@expo/*/android/build.gradle')
@@ -87,33 +88,30 @@ print(f"  Exists: {os.path.isfile(libs_toml)}")
 if os.path.isfile(libs_toml):
     with open(libs_toml, 'r') as fp:
         content = fp.read()
-    print(f"  Original content snippet:")
+    print(f"  Original content snippet (all androidx lines):")
     for line in content.split('\n'):
-        if 'androidx' in line and ('core' in line or 'activity' in line or 'fragment' in line or 'lifecycle' in line):
+        if 'androidx' in line:
             print(f"    {line.strip()}")
-    # Use regex to find and replace androidx versions
-    import re
-    # Match patterns like: androidx-core = "1.17.0" or androidx-core="1.17.0"
-    patterns = [
-        (r'androidx-core\s*=\s*"1\.17\.0"', 'androidx-core = "1.15.0"'),
-        (r'androidx-activity\s*=\s*"1\.17\.0"', 'androidx-activity = "1.15.0"'),
-        (r'androidx-fragment\s*=\s*"1\.17\.0"', 'androidx-fragment = "1.15.0"'),
-        (r'androidx-lifecycle\s*=\s*"1\.17\.0"', 'androidx-lifecycle = "1.15.0"'),
-    ]
-    for pattern, replacement in patterns:
-        if re.search(pattern, content):
-            content = re.sub(pattern, replacement, content)
-            print(f"  Replaced: {pattern} -> {replacement}")
+    # Replace any androidx version that's 1.17.0 with 1.15.0
+    # The format is: name = "1.17.0" or name = "1.17.0" or name="1.17.0"
+    lines = content.split('\n')
+    new_lines = []
+    for line in lines:
+        if 'androidx' in line and '1.17.0' in line:
+            new_line = line.replace('1.17.0', '1.15.0')
+            print(f"  Replaced: {line.strip()} -> {new_line.strip()}")
+            new_lines.append(new_line)
         else:
-            print(f"  Pattern NOT FOUND: {pattern}")
+            new_lines.append(line)
+    content = '\n'.join(new_lines)
     with open(libs_toml, 'w') as fp:
         fp.write(content)
     # Verify after write
     with open(libs_toml, 'r') as fp:
         content = fp.read()
-    print(f"  After write content snippet:")
+    print(f"  After write content snippet (all androidx lines):")
     for line in content.split('\n'):
-        if 'androidx' in line and ('core' in line or 'activity' in line or 'fragment' in line or 'lifecycle' in line):
+        if 'androidx' in line:
             print(f"    {line.strip()}")
 
 # Patch app build.gradle to ensure compileSdk is 35
