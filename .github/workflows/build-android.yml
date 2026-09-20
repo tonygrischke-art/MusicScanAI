@@ -62,6 +62,19 @@ jobs:
         kotlin.code.style=official
         EOF
 
+    - name: Patch expo-application build.gradle for expo-module-gradle-plugin
+      run: |
+        EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
+        EXPO_PLUGIN="node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"
+        if [ -f "$EXPO_APP_GRADLE" ]; then
+          python3 scripts/patch_expo_gradle.py "$EXPO_APP_GRADLE" "$EXPO_PLUGIN"
+          # Add compileSdkVersion after patching
+          sed -i '/^android {/a\    compileSdkVersion 34' "$EXPO_APP_GRADLE"
+          echo "Patched $EXPO_APP_GRADLE and $EXPO_PLUGIN"
+        else
+          echo "Warning: $EXPO_APP_GRADLE not found"
+        fi
+
     - name: Patch app build.gradle for hermesenabled property
       run: |
         APP_GRADLE="android/app/build.gradle"
