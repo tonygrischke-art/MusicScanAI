@@ -62,15 +62,30 @@ jobs:
         kotlin.code.style=official
         EOF
 
-    - name: Patch expo-application build.gradle for expo-module-gradle-plugin
+    - name: Add expo-module-gradle-plugin to pluginManagement
+      run: |
+        SETTINGS_GRADLE="android/settings.gradle"
+        if [ -f "$SETTINGS_GRADLE" ]; then
+          # Add pluginManagement block at the top if not present
+          if ! grep -q "pluginManagement" "$SETTINGS_GRADLE"; then
+            sed -i '1i\pluginManagement {\n    repositories {\n        gradlePluginPortal()\n        google()\n        mavenCentral()\n    }\n    plugins {\n        id "expo-module-gradle-plugin" version "0.5.0"\n    }\n}\n' "$SETTINGS_GRADLE"
+            echo "Added pluginManagement to $SETTINGS_GRADLE"
+          else
+            echo "pluginManagement already exists in $SETTINGS_GRADLE"
+          fi
+        else
+          echo "Warning: $SETTINGS_GRADLE not found"
+        fi
+
+    - name: Patch expo-application build.gradle for compileSdkVersion
       run: |
         EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
-        EXPO_PLUGIN="node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"
         if [ -f "$EXPO_APP_GRADLE" ]; then
-          python3 scripts/patch_expo_gradle.py "$EXPO_APP_GRADLE" "$EXPO_PLUGIN"
-          # Add compileSdkVersion after patching
-          sed -i '/^android {/a\    compileSdkVersion 34' "$EXPO_APP_GRADLE"
-          echo "Patched $EXPO_APP_GRADLE and $EXPO_PLUGIN"
+          # Add compileSdkVersion if missing
+          if ! grep -q "compileSdkVersion" "$EXPO_APP_GRADLE"; then
+            sed -i '/^android {/a\    compileSdkVersion 34' "$EXPO_APP_GRADLE"
+            echo "Added compileSdkVersion to $EXPO_APP_GRADLE"
+          fi
         else
           echo "Warning: $EXPO_APP_GRADLE not found"
         fi
