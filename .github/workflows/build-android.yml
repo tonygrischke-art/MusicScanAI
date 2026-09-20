@@ -64,16 +64,13 @@ jobs:
 
     - name: Patch all expo modules to use ExpoModulesCorePlugin
       run: |
-        # Find all expo module build.gradle files that use expo-module-gradle-plugin
         for f in node_modules/expo-*/android/build.gradle node_modules/@expo/*/android/build.gradle; do
           if [ -f "$f" ] && grep -q "expo-module-gradle-plugin" "$f"; then
             echo "Patching $f"
             # Remove the plugin id line
-            sed -i "/id 'expo-module-gradle-plugin'/d" "$f"
-            sed -i '/id "expo-module-gradle-plugin"/d' "$f"
-            # Add apply from ExpoModulesCorePlugin.gradle AFTER plugins block
-            # Find the line with closing brace of plugins block and insert after it
-            sed -i '/^plugins {/,/^}/ { /^}/a\apply from: "${project.rootDir}\/..\/node_modules\/expo-modules-core\/android\/ExpoModulesCorePlugin.gradle"' "$f"
+            sed -i "/expo-module-gradle-plugin/d" "$f"
+            # Insert apply from AFTER the plugins block (match closing brace with optional whitespace)
+            sed -i '/^plugins {/,/^[[:space:]]*}/ { /^[[:space:]]*}/a\apply from: "${project.rootDir}/../node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"' "$f"
             # Add compileSdkVersion if missing
             if ! grep -q "compileSdkVersion" "$f"; then
               sed -i '/^android {/a\    compileSdkVersion 34' "$f"
@@ -86,7 +83,6 @@ jobs:
       run: |
         PLUGIN_FILE="node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"
         if [ -f "$PLUGIN_FILE" ]; then
-          # Fix the components.release reference
           sed -i 's/from components\.release/from (components.findByName("release") ?: components.findByName("main") ?: components.findByName("android") ?: components.findByName("aar"))/g' "$PLUGIN_FILE"
           echo "Fixed $PLUGIN_FILE"
         else
