@@ -62,17 +62,6 @@ jobs:
         kotlin.code.style=official
         EOF
 
-    - name: Patch expo-application build.gradle for expo-module-gradle-plugin
-      run: |
-        EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
-        EXPO_PLUGIN="node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"
-        if [ -f "$EXPO_APP_GRADLE" ]; then
-          python3 scripts/patch_expo_gradle.py "$EXPO_APP_GRADLE" "$EXPO_PLUGIN"
-          echo "Patched $EXPO_APP_GRADLE and $EXPO_PLUGIN"
-        else
-          echo "Warning: $EXPO_APP_GRADLE not found"
-        fi
-
     - name: Patch app build.gradle for hermesenabled property
       run: |
         APP_GRADLE="android/app/build.gradle"
@@ -80,6 +69,7 @@ jobs:
           sed -i "/def useHermes = project.hasProperty('hermesEnabled')/d" "$APP_GRADLE"
           sed -i "/def useHermes = project.hasProperty('hermesenabled')/d" "$APP_GRADLE"
           sed -i '/dependencies {/a\    def useHermes = project.hasProperty('\''hermesenabled'\'') ? project.property('\''hermesenabled'\'').toBoolean() : false' "$APP_GRADLE"
+          sed -i 's/\bhermesEnabled\b/useHermes/g' "$APP_GRADLE"
           echo "Patched $APP_GRADLE"
         else
           echo "Warning: $APP_GRADLE not found"
@@ -92,7 +82,7 @@ jobs:
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+        ./gradlew assembleDebug --no-daemon -Phermesenabled=false -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
 
     - name: Upload APK
       if: success()
