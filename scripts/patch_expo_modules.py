@@ -133,6 +133,42 @@ if os.path.isfile(libs_toml):
         if 'androidx' in line:
             print(f"    {line.strip()}")
 
+# Patch root build.gradle to add resolutionStrategy to force androidx.core versions
+root_gradle = 'android/build.gradle'
+print(f"\n=== Checking root build.gradle ===")
+print(f"  Exists: {os.path.isfile(root_gradle)}")
+if os.path.isfile(root_gradle):
+    with open(root_gradle, 'r') as fp:
+        content = fp.read()
+    # Add resolutionStrategy to subprojects block
+    if 'resolutionStrategy' not in content:
+        if 'subprojects {' in content:
+            resolution_strategy = '''
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.15.0'
+            force 'androidx.core:core-ktx:1.15.0'
+        }
+    }
+'''
+            content = content.replace('subprojects {', resolution_strategy)
+            print(f"  Added resolutionStrategy to root build.gradle")
+        elif 'allprojects {' in content:
+            resolution_strategy = '''
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.15.0'
+            force 'androidx.core:core-ktx:1.15.0'
+        }
+    }
+'''
+            content = content.replace('allprojects {', resolution_strategy)
+            print(f"  Added resolutionStrategy to root build.gradle (allprojects)")
+    with open(root_gradle, 'w') as fp:
+        fp.write(content)
+
 # Patch app build.gradle to ensure compileSdk is 35
 app_gradle = 'android/app/build.gradle'
 print(f"\n=== Checking app build.gradle ===")
