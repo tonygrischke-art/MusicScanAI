@@ -35,8 +35,8 @@ for f in expo_modules:
             in_plugins = False
     content = '\n'.join(new_lines)
     if 'compileSdkVersion' not in content:
-        content = content.replace('android {', 'android {\n    compileSdkVersion 36', 1)
-        print(f"    Added compileSdkVersion 36")
+        content = content.replace('android {', 'android {\n    compileSdkVersion 35', 1)
+        print(f"    Added compileSdkVersion 35")
     with open(f, 'w') as fp:
         fp.write(content)
 
@@ -80,75 +80,34 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch libs.versions.toml to upgrade AGP and compileSdk
-libs_toml = 'node_modules/react-native/gradle/libs.versions.toml'
-print(f"\n=== Checking libs.versions.toml ===")
-print(f"  Exists: {os.path.isfile(libs_toml)}")
-if os.path.isfile(libs_toml):
-    with open(libs_toml, 'r') as fp:
-        content = fp.read()
-    print(f"  Original content snippet (agp line):")
-    for line in content.split('\n'):
-        if 'agp' in line or 'compileSdk' in line or 'targetSdk' in line or 'buildTools' in line:
-            print(f"    {line.strip()}")
-    # Upgrade AGP from 8.6.0 to 8.9.1
-    if 'agp = "8.6.0"' in content:
-        content = content.replace('agp = "8.6.0"', 'agp = "8.9.1"')
-        print(f"  Upgraded AGP to 8.9.1")
-    else:
-        print(f"  agp = \"8.6.0\" NOT FOUND!")
-    # Upgrade compileSdk from 35 to 36
-    if 'compileSdk = "35"' in content:
-        content = content.replace('compileSdk = "35"', 'compileSdk = "36"')
-        print(f"  Upgraded compileSdk to 36")
-    else:
-        print(f"  compileSdk = \"35\" NOT FOUND!")
-    # Upgrade targetSdk from 34 to 35
-    if 'targetSdk = "34"' in content:
-        content = content.replace('targetSdk = "34"', 'targetSdk = "35"')
-        print(f"  Upgraded targetSdk to 35")
-    else:
-        print(f"  targetSdk = \"34\" NOT FOUND!")
-    # Upgrade buildTools from 35.0.0 to 36.0.0
-    if 'buildTools = "35.0.0"' in content:
-        content = content.replace('buildTools = "35.0.0"', 'buildTools = "36.0.0"')
-        print(f"  Upgraded buildTools to 36.0.0")
-    else:
-        print(f"  buildTools = \"35.0.0\" NOT FOUND!")
-    with open(libs_toml, 'w') as fp:
-        fp.write(content)
-    # Verify after write
-    with open(libs_toml, 'r') as fp:
-        content = fp.read()
-    print(f"  After write content snippet:")
-    for line in content.split('\n'):
-        if 'agp' in line or 'compileSdk' in line or 'targetSdk' in line or 'buildTools' in line:
-            print(f"    {line.strip()}")
-
-# Patch root build.gradle to use compileSdkVersion 36
-root_gradle = 'android/build.gradle'
-print(f"\n=== Checking root build.gradle ===")
-print(f"  Exists: {os.path.isfile(root_gradle)}")
-if os.path.isfile(root_gradle):
-    with open(root_gradle, 'r') as fp:
-        content = fp.read()
-    with open(root_gradle, 'w') as fp:
-        fp.write(content)
-
-# Patch app build.gradle to use compileSdk 36
+# Patch app build.gradle to force androidx.core versions compatible with AGP 8.6.0 / compileSdk 35
 app_gradle = 'android/app/build.gradle'
 print(f"\n=== Checking app build.gradle ===")
 print(f"  Exists: {os.path.isfile(app_gradle)}")
 if os.path.isfile(app_gradle):
     with open(app_gradle, 'r') as fp:
         content = fp.read()
-    if 'compileSdkVersion' in content:
-        content = content.replace('compileSdkVersion 35', 'compileSdkVersion 36')
-        content = content.replace('compileSdkVersion 34', 'compileSdkVersion 36')
-        print(f"  Updated compileSdkVersion to 36")
-    else:
-        content = content.replace('android {', 'android {\n    compileSdkVersion 36', 1)
-        print(f"  Added compileSdkVersion 36")
+    # Add resolutionStrategy to force androidx.core versions
+    if 'resolutionStrategy' not in content:
+        if 'dependencies {' in content:
+            resolution_strategy = '''
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core:1.15.0'
+        force 'androidx.core:core-ktx:1.15.0'
+    }
+}
+
+'''
+            content = content.replace('dependencies {', resolution_strategy + 'dependencies {')
+            print(f"  Added resolutionStrategy for androidx.core 1.15.0")
+    # Also ensure compileSdk is 35
+    if 'compileSdkVersion 36' in content:
+        content = content.replace('compileSdkVersion 36', 'compileSdkVersion 35')
+        print(f"  Changed compileSdkVersion to 35")
+    elif 'compileSdkVersion' not in content:
+        content = content.replace('android {', 'android {\n    compileSdkVersion 35', 1)
+        print(f"  Added compileSdkVersion 35")
     with open(app_gradle, 'w') as fp:
         fp.write(content)
 
