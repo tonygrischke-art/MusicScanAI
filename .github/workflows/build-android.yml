@@ -62,6 +62,32 @@ jobs:
         kotlin.code.style=official
         EOF
 
+    - name: Patch expo-application build.gradle for expo-module-gradle-plugin
+      run: |
+        EXPO_APP_GRADLE="node_modules/expo-application/android/build.gradle"
+        EXPO_PLUGIN="node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"
+        if [ -f "$EXPO_APP_GRADLE" ]; then
+          python3 scripts/patch_expo_gradle.py "$EXPO_APP_GRADLE" "$EXPO_PLUGIN"
+          echo "Patched $EXPO_APP_GRADLE and $EXPO_PLUGIN"
+        else
+          echo "Warning: $EXPO_APP_GRADLE not found"
+        fi
+
+    - name: Patch app build.gradle for hermesenabled property
+      run: |
+        APP_GRADLE="android/app/build.gradle"
+        if [ -f "$APP_GRADLE" ]; then
+          sed -i "/def useHermes = project.hasProperty('hermesEnabled')/d" "$APP_GRADLE"
+          sed -i "/def useHermes = project.hasProperty('hermesenabled')/d" "$APP_GRADLE"
+          sed -i '/dependencies {/a\    def useHermes = project.hasProperty('\''hermesenabled'\'') ? project.property('\''hermesenabled'\'').toBoolean() : false' "$APP_GRADLE"
+          echo "Patched $APP_GRADLE"
+        else
+          echo "Warning: $APP_GRADLE not found"
+        fi
+
+    - name: Grant gradlew execute permission
+      run: chmod +x android/gradlew
+
     - name: Build Android
       run: |
         cd android
