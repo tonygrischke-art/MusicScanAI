@@ -80,41 +80,42 @@ if os.path.isfile(reanimated_gradle):
     with open(reanimated_gradle, 'w') as fp:
         fp.write(content)
 
-# Patch root build.gradle to add resolutionStrategy for all subprojects
-root_gradle = 'android/build.gradle'
-print(f"\n=== Checking root build.gradle ===")
-print(f"  Exists: {os.path.isfile(root_gradle)}")
-if os.path.isfile(root_gradle):
-    with open(root_gradle, 'r') as fp:
+# Patch libs.versions.toml to use androidx.core 1.15.0 (compatible with AGP 8.6.0 / compileSdk 35)
+libs_toml = 'node_modules/react-native/gradle/libs.versions.toml'
+print(f"\n=== Checking libs.versions.toml ===")
+print(f"  Exists: {os.path.isfile(libs_toml)}")
+if os.path.isfile(libs_toml):
+    with open(libs_toml, 'r') as fp:
         content = fp.read()
-    # Add resolutionStrategy to subprojects block
-    if 'resolutionStrategy' not in content:
-        if 'subprojects {' in content:
-            resolution_strategy = '''
-subprojects {
-    configurations.all {
-        resolutionStrategy {
-            force 'androidx.core:core:1.15.0'
-            force 'androidx.core:core-ktx:1.15.0'
-        }
-    }
-'''
-            content = content.replace('subprojects {', resolution_strategy)
-            print(f"  Added resolutionStrategy to root build.gradle")
-        elif 'allprojects {' in content:
-            resolution_strategy = '''
-allprojects {
-    configurations.all {
-        resolutionStrategy {
-            force 'androidx.core:core:1.15.0'
-            force 'androidx.core:core-ktx:1.15.0'
-        }
-    }
-'''
-            content = content.replace('allprojects {', resolution_strategy)
-            print(f"  Added resolutionStrategy to root build.gradle (allprojects)")
-    with open(root_gradle, 'w') as fp:
+    print(f"  Original content snippet:")
+    for line in content.split('\n'):
+        if 'androidx' in line and ('core' in line or 'activity' in line or 'fragment' in line or 'lifecycle' in line):
+            print(f"    {line.strip()}")
+    # Downgrade androidx.core to 1.15.0
+    if 'androidx-core = "1.17.0"' in content:
+        content = content.replace('androidx-core = "1.17.0"', 'androidx-core = "1.15.0"')
+        print(f"  Downgraded androidx-core to 1.15.0")
+    else:
+        print(f"  androidx-core = \"1.17.0\" NOT FOUND!")
+    # Also check for androidx-activity, androidx-fragment, androidx-lifecycle
+    if 'androidx-activity = "1.17.0"' in content:
+        content = content.replace('androidx-activity = "1.17.0"', 'androidx-activity = "1.15.0"')
+        print(f"  Downgraded androidx-activity to 1.15.0")
+    if 'androidx-fragment = "1.17.0"' in content:
+        content = content.replace('androidx-fragment = "1.17.0"', 'androidx-fragment = "1.15.0"')
+        print(f"  Downgraded androidx-fragment to 1.15.0")
+    if 'androidx-lifecycle = "1.17.0"' in content:
+        content = content.replace('androidx-lifecycle = "1.17.0"', 'androidx-lifecycle = "1.15.0"')
+        print(f"  Downgraded androidx-lifecycle to 1.15.0")
+    with open(libs_toml, 'w') as fp:
         fp.write(content)
+    # Verify after write
+    with open(libs_toml, 'r') as fp:
+        content = fp.read()
+    print(f"  After write content snippet:")
+    for line in content.split('\n'):
+        if 'androidx' in line and ('core' in line or 'activity' in line or 'fragment' in line or 'lifecycle' in line):
+            print(f"    {line.strip()}")
 
 # Patch app build.gradle to ensure compileSdk is 35
 app_gradle = 'android/app/build.gradle'
