@@ -63,21 +63,7 @@ jobs:
         EOF
 
     - name: Patch all expo modules to use ExpoModulesCorePlugin
-      run: |
-        for f in node_modules/expo-*/android/build.gradle node_modules/@expo/*/android/build.gradle; do
-          if [ -f "$f" ] && grep -q "expo-module-gradle-plugin" "$f"; then
-            echo "Patching $f"
-            # Remove the plugin id line
-            sed -i "/expo-module-gradle-plugin/d" "$f"
-            # Insert apply from AFTER the plugins block (match closing brace with optional whitespace)
-            sed -i '/^plugins {/,/^[[:space:]]*}/ { /^[[:space:]]*}/a\apply from: "${project.rootDir}/../node_modules/expo-modules-core/android/ExpoModulesCorePlugin.gradle"' "$f"
-            # Add compileSdkVersion if missing
-            if ! grep -q "compileSdkVersion" "$f"; then
-              sed -i '/^android {/a\    compileSdkVersion 34' "$f"
-            fi
-          fi
-        done
-        echo "Patched all expo modules"
+      run: python3 scripts/patch_expo_modules.py
 
     - name: Fix ExpoModulesCorePlugin.gradle components.release issue
       run: |
