@@ -146,15 +146,14 @@ android {
     }
 }
 
+def useHermes = (findProperty('hermesEnabled') ?: "false") == "true"
+def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true"
+def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true"
+def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true"
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
-    def useHermes = project.hasProperty('hermesenabled') ? project.property('hermesenabled').toBoolean() : false
-
-    def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
-    def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
-    def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
 
     if (isGifEnabled) {
         // For animated gif support
