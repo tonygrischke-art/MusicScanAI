@@ -7,15 +7,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
+    "jsEngine": "hermes",
     "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "enableHermes": false
-          }
-        }
-      ],
+      "expo-build-properties",
       [
         "expo-media-library",
         {
@@ -57,7 +51,6 @@
       },
       "permissions": [
         "READ_MEDIA_AUDIO",
-        "READ_EXTERNAL_STORAGE",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "WAKE_LOCK",
