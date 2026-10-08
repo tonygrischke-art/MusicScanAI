@@ -15,7 +15,7 @@ import {
   findNearestTracks,
   areKeysCompatible,
 } from '../services/moodEngine';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID as uuidv4 } from 'expo-crypto';
 
 export class JourneyGenerator {
   private library: Track[];
