@@ -36,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
     // Log to Sentry if available
-    if (typeof Sentry !== 'undefined' && Sentry.captureException) {
+    if (Sentry && typeof Sentry.captureException === 'function') {
       Sentry.captureException(error, {
         extra: errorInfo,
       });
@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <Button
                 title="Report Issue"
                 onPress={() => {
-                  if (typeof Sentry !== 'undefined' && Sentry.captureException) {
+                  if (Sentry && typeof Sentry.captureException === 'function') {
                     Sentry.captureMessage('User tapped Report Issue from ErrorBoundary');
                   }
                 }}
