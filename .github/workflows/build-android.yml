@@ -75,19 +75,6 @@ jobs:
           echo "Warning: $PLUGIN_FILE not found"
         fi
 
-    - name: Patch app build.gradle for hermesenabled property
-      run: |
-        APP_GRADLE="android/app/build.gradle"
-        if [ -f "$APP_GRADLE" ]; then
-          sed -i "/def useHermes = project.hasProperty('hermesEnabled')/d" "$APP_GRADLE"
-          sed -i "/def useHermes = project.hasProperty('hermesenabled')/d" "$APP_GRADLE"
-          sed -i '/dependencies {/a\    def useHermes = project.hasProperty('\''hermesenabled'\'') ? project.property('\''hermesenabled'\'').toBoolean() : false' "$APP_GRADLE"
-          sed -i 's/\bhermesEnabled\b/useHermes/g' "$APP_GRADLE"
-          echo "Patched $APP_GRADLE"
-        else
-          echo "Warning: $APP_GRADLE not found"
-        fi
-
     - name: Grant gradlew execute permission
       run: chmod +x android/gradlew
 
@@ -95,7 +82,7 @@ jobs:
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon -Phermesenabled=false -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
 
     - name: Upload APK
       if: success()
