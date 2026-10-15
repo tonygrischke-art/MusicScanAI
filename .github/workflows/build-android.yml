@@ -83,14 +83,14 @@ jobs:
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
+        ./gradlew assembleRelease --no-daemon -Dorg.gradle.workers.max=2 --info 2>&1 | tee build_output.txt; exit ${PIPESTATUS[0]}
 
     - name: Upload APK
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: MusicScanAI-Debug
-        path: android/app/build/outputs/apk/debug/*.apk
+        path: android/app/build/outputs/apk/release/*.apk
         retention-days: 30
 
     - name: Upload build log on failure
