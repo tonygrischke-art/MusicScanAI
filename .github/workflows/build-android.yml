@@ -80,6 +80,8 @@ jobs:
       run: chmod +x android/gradlew
 
     - name: Build Android
+      env:
+        JS_RUNTIME: hermes
       run: |
         cd android
         chmod +x gradlew
