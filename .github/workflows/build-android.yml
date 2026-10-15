@@ -60,6 +60,7 @@ jobs:
         android.useAndroidX=true
         android.enableJetifier=true
         kotlin.code.style=official
+        hermesEnabled=true
         EOF
 
     - name: Patch all expo modules to use ExpoModulesCorePlugin
