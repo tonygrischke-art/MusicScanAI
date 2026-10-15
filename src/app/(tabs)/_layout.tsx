@@ -159,7 +159,6 @@ export default function TabsLayout() {
         name="player"
         options={{
           href: null,
-          tabBarButton: () => null,
         }}
       />
     </Tabs>
