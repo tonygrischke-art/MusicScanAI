@@ -101,13 +101,25 @@ export const ScanningService = {
     callbacks.onProgress(progress);
 
     try {
-      const { assets, totalCount } = await MediaLibrary.getAssetsAsync({
-        mediaType: MediaLibrary.MediaType.audio,
-        first: 1000,
-        sortBy: [MediaLibrary.SortBy.default],
-      });
+      // Paged scan: 200 per page, walk hasNextPage until exhausted (no 1000 cap)
+      const assets: MediaLibrary.Asset[] = [];
+      let after: string | undefined = undefined;
+      let hasNextPage = true;
+      while (hasNextPage) {
+        const page = await MediaLibrary.getAssetsAsync({
+          mediaType: MediaLibrary.MediaType.audio,
+          first: 200,
+          ...(after ? { after } : {}),
+          sortBy: [MediaLibrary.SortBy.default],
+        });
+        assets.push(...page.assets);
+        progress.totalFiles = page.totalCount;
+        callbacks.onProgress({ ...progress });
+        after = page.endCursor;
+        hasNextPage = page.hasNextPage;
+      }
 
-      progress.totalFiles = totalCount;
+      progress.totalFiles = assets.length;
       callbacks.onProgress({ ...progress });
 
       const tracks: Track[] = [];
@@ -137,7 +149,7 @@ export const ScanningService = {
             album: assetAny.album || null,
             genre: 'pop',
             year: null,
-            duration: metadata.duration || 0,
+            duration: asset.duration || 0,
             path: asset.uri,
             artwork: artworkUri,
             blurhash,
@@ -207,24 +219,6 @@ export const ScanningService = {
     }
 
     return samples;
-  },
-
-  async getAudioInfo(uri: string): Promise<{
-    duration: number;
-    bitrate: number;
-    sampleRate: number;
-    channels: number;
-  } | null> {
-    try {
-      return {
-        duration: Math.floor(Math.random() * 300) + 60,
-        bitrate: 320,
-        sampleRate: 44100,
-        channels: 2,
-      };
-    } catch {
-      return null;
-    }
   },
 };
 
